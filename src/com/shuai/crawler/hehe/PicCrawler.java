@@ -1,0 +1,197 @@
+package com.shuai.crawler.hehe;
+
+import java.io.IOException;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import com.shuai.crawler.hehe.data.AlbumInfo;
+import com.shuai.crawler.hehe.data.AlbumInfo.PicInfo;
+
+/**
+ * 热门相册爬虫
+ */
+public class PicCrawler {
+
+	/**
+	 * 爬虫的起始url
+	 */
+	private String mStartUrl;
+
+	/**
+	 * 已经爬过的相册数
+	 */
+	private int mAlbumCount;
+
+	/**
+	 * 已经爬过的页面数
+	 */
+	private int mPageCount;
+	
+	private static int MAX_ALBUM_COUNT=1;
+
+	public PicCrawler(String startUrl) {
+		mStartUrl = startUrl;
+	}
+
+	public void start() {
+		getAlbums(mStartUrl);
+	}
+
+	/**
+	 * 获取该页面包含的相册
+	 * @param url 从该页面爬取相册
+	 */
+	private void getAlbums(String url) {
+		if (url == null)
+			new IllegalArgumentException();
+
+		url = url.trim();
+		if (url.isEmpty())
+			throw new IllegalArgumentException();
+		
+		System.out.println(String.format("正在爬取相册列表，url:%s",url));
+
+		++mPageCount;
+
+		if (mPageCount > 10)
+			return;
+
+		Document doc;
+		try {
+			doc = Jsoup.connect(url).get();
+			// System.out.print(doc);
+			Elements items = doc.select(".share-hot-list .share.clearfix");
+			
+			System.out.println("pagecount:" + items.size());
+			for(Element element:items){
+				Element link = element.select("h3 a[href]").get(0);
+				//TODO:check
+				String title = link.ownText();
+				String href = link.attr("href");
+				
+				Element img=element.select(".content .photos img").get(0);
+				String thumbUrl=img.attr("src");
+				if (href.startsWith("http://share.renren.com/")) {
+					System.out.println(title);
+					System.out.println(href);
+					System.out.println("count:" + ++mAlbumCount);
+					getAlbumInfo(href,title,thumbUrl);
+
+				}
+
+			}
+			
+
+			Elements elements = doc.select(".pagerpro a[title=下一页]");
+			// check element count,==1.if >1 ?
+			if (elements.size() > 0) {
+				Element nextPageElement = elements.get(0);
+				String nextPageUrl = nextPageElement.attr("href");
+
+				// System.out.println();
+				// System.out.println();
+
+				getAlbums(nextPageUrl);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 获取相册信息
+	 * @param albumUrl
+	 * @param albumTitle
+	 * @param albumThumbUrl
+	 */
+	private void getAlbumInfo(String albumUrl, String albumTitle,String albumThumbUrl){
+		AlbumInfo albumInfo=new AlbumInfo();
+		albumInfo.mTitle=albumTitle;
+		albumInfo.mAlbumThumbUrl=albumThumbUrl;
+		
+		System.out.print(String.format("正在爬取相册图片\n相册名：%s\nurl:%s\n缩略图:%s\n",albumTitle,albumUrl,albumThumbUrl));
+		getAlbumPics(albumUrl,albumInfo);
+		
+		System.out.println(String.format("相册:%s包含%d张图片",albumTitle,albumInfo.mPics.size()));
+	}
+
+	/**
+	 * 获取该相册的图片
+	 * @param albumUrl 相册url
+	 * @param albumTitle 相册名
+	 */
+	private void getAlbumPics(String albumUrl, AlbumInfo albumInfo) {
+		if (albumUrl == null)
+			new IllegalArgumentException();
+
+		albumUrl = albumUrl.trim();
+		if (albumUrl.isEmpty())
+			throw new IllegalArgumentException();
+		
+
+		Document doc;
+		try {
+			doc = Jsoup.connect(albumUrl).get();
+			// System.out.print(doc);
+			Elements items = doc.select("#albumThumbMode li");
+			for (Element item : items) {
+				try {
+					Element link = item.select("span a").get(0);
+					Element thumbPic = item.select("span a img").get(0);
+
+					// 图片描述
+					String picDescription = link.attr("title");
+					// 大图地址
+					String bigPicUrl = getBigPicUrl(link.attr("href"));
+					// 缩略图地址
+					String thumbPicUrl = thumbPic.attr("src");
+					
+					System.out.println();
+					System.out.println(picDescription);
+					System.out.println(thumbPicUrl);
+					System.out.println(bigPicUrl);
+					
+					PicInfo picInfo=new PicInfo();
+					picInfo.mThumbUrl=thumbPicUrl;
+					picInfo.mBigUrl=bigPicUrl;
+					picInfo.mDescription=picDescription;
+					albumInfo.mPics.add(picInfo);
+				} catch (Exception e) {
+					// TODO:log
+					e.printStackTrace();
+				}
+			}
+			
+			//如果该相册有多页继续爬取下一页
+			Elements elements = doc.select(".chn[title=下一页]");
+			// check element count,==1.if >1 ?
+			if (elements.size() > 0) {
+				Element nextPageElement = elements.get(0);
+				String nextPageUrl = nextPageElement.attr("href");
+
+				// System.out.println();
+				// System.out.println();
+
+				getAlbumPics(nextPageUrl,albumInfo);
+			}
+		} catch (IOException e) {
+			// TODO:log
+			e.printStackTrace();
+		}
+	}
+
+	private String getBigPicUrl(String url) throws IOException {
+		String bigPicUrl = null;
+		
+		Document doc;
+		doc = Jsoup.connect(url).get();
+		Elements elements=doc.select("#photoLink img");
+		if(elements.size()>0)
+			bigPicUrl=elements.get(0).attr("src");
+		return bigPicUrl;
+	}
+
+}
