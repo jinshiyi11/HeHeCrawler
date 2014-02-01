@@ -7,7 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.shuai.crawler.hehe.PicCrawler;
+import com.shuai.hehe.crawler.PicCrawler;
+import com.shuai.hehe.crawler.VideoCrawler;
 
 public class TestJsoup {
 
@@ -18,8 +19,11 @@ public class TestJsoup {
 		
 //		getHotPics("http://share.renren.com/albumlist/0",0,0);
 		
-		PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
-		picCrawler.start();
+//		PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
+//		picCrawler.start();
+		
+		VideoCrawler videoCrawler=new VideoCrawler("http://share.renren.com/videolist/0");
+		videoCrawler.start();
 	}
 	
 	public static void getHotPics(String url,Integer count,int stackDeep){

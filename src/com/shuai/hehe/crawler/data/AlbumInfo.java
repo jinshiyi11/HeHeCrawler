@@ -1,4 +1,4 @@
-package com.shuai.crawler.hehe.data;
+package com.shuai.hehe.crawler.data;
 
 import java.util.ArrayList;
 

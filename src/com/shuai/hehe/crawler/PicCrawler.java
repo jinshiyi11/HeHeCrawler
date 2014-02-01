@@ -1,4 +1,4 @@
-package com.shuai.crawler.hehe;
+package com.shuai.hehe.crawler;
 
 import java.io.IOException;
 
@@ -7,8 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.shuai.crawler.hehe.data.AlbumInfo;
-import com.shuai.crawler.hehe.data.AlbumInfo.PicInfo;
+import com.shuai.hehe.crawler.data.AlbumInfo;
+import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
 /**
  * 热门相册爬虫
