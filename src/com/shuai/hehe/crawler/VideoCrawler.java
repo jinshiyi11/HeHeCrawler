@@ -7,6 +7,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.shuai.hehe.crawler.data.DataManager;
+import com.shuai.hehe.crawler.data.VideoInfo;
+
 /**
  * 热门视频爬虫
  */
@@ -94,6 +97,12 @@ public class VideoCrawler {
 				System.out.println(title);
 				System.out.println(videoUrl);
 				System.out.println(thumbImgUrl);
+				
+				VideoInfo info=new VideoInfo();
+				info.mTitle=title;
+				info.mVideoThumbUrl=thumbImgUrl;
+				info.mVideoUrl=videoUrl;
+				DataManager.getInstance().addHotVideo(info);
 			}
 			
 
