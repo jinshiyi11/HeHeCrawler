@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.shuai.hehe.crawler.data.AlbumInfo;
+import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
 /**
@@ -114,6 +115,8 @@ public class PicCrawler {
 		
 		System.out.print(String.format("正在爬取相册图片\n相册名：%s\nurl:%s\n缩略图:%s\n",albumTitle,albumUrl,albumThumbUrl));
 		getAlbumPics(albumUrl,albumInfo);
+		
+		DataManager.getInstance().addHotAlbum(albumInfo);
 		
 		System.out.println(String.format("相册:%s包含%d张图片",albumTitle,albumInfo.mPics.size()));
 	}

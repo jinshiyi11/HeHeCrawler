@@ -2,16 +2,23 @@ package com.shuai.hehe.crawler.data;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
+
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
 public class DataManager {
 	
 	private static DataManager mDataManager;
 	private Connection mConnection;
+	
+	private static String[] FEED_TABLES={"hot_feed","hot_album","hot_video"};
 	
 	private DataManager(){
 //		try {
@@ -32,10 +39,19 @@ public class DataManager {
 			Connection connection=getConnection();
 			
 			String[] sqls={
-					"CREATE TABLE IF NOT EXISTS hot_feed(id INTEGER PRIMARY KEY,type INTEGER,title TEXT,content TEXT,[from] INTEGER,insert_time DATETIME DEFAULT (datetime('now','localtime')))",
-					"CREATE TABLE IF NOT EXISTS hot_feed(id INTEGER PRIMARY KEY,feed_id INTEGER,thumb_url TEXT,big_url TEXT,description TEXT,insert_time DATETIME)"};
+					"CREATE TABLE IF NOT EXISTS hot_album(id INTEGER PRIMARY KEY," +
+							"type INTEGER,title TEXT UNIQUE NOT NULL," +
+							"content TEXT,[from] INTEGER," +
+							"insert_time DATETIME DEFAULT (datetime('now','localtime')))",
+							
+					"CREATE TABLE IF NOT EXISTS hot_video(id INTEGER PRIMARY KEY," +
+							"type INTEGER,title TEXT UNIQUE NOT NULL," +
+							"content TEXT,[from] INTEGER," +
+							"insert_time DATETIME DEFAULT (datetime('now','localtime')))",
+							
+					"CREATE TABLE IF NOT EXISTS pic(id INTEGER PRIMARY KEY,feed_id INTEGER,thumb_url TEXT,big_url TEXT,description TEXT,insert_time DATETIME DEFAULT (datetime('now','localtime')))"};
 			
-			String[] indexs={"CREATE INDEX IF NOT EXISTS type_title_index ON hot_feed(type,title)"};
+//			String[] indexs={"CREATE INDEX IF NOT EXISTS type_title_index ON hot_feed(type,title)"};
 			
 			Statement statement = connection.createStatement();
 			//创建表
@@ -44,9 +60,9 @@ public class DataManager {
 			}
 			
 			//创建索引
-			for(String sql:indexs){
-				statement.execute(sql);				
-			}
+//			for(String sql:indexs){
+//				statement.execute(sql);				
+//			}
 			
 			closeConnection();
 		} catch (SQLException e) {
@@ -87,10 +103,15 @@ public class DataManager {
 		String thumbImgUrl;
 	}
 	
+	private static class AlbumContent{
+		String thumbImgUrl;
+	}
+	
 	public void addHotVideo(VideoInfo info) {
+		Statement statement = null;
 		try {
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
+			statement = connection.createStatement();
 			
 			VideoContent videoContent=new VideoContent();
 			videoContent.videoUrl=info.mVideoUrl;
@@ -100,13 +121,54 @@ public class DataManager {
 			String content=gson.toJson(videoContent);
 			
 			
-			String sql=String.format("INSERT INTO hot_feed(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_VIDEO,info.mTitle,content,FromType.FROM_RENREN);
+			String sql=String.format("INSERT INTO hot_video(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_VIDEO,info.mTitle,content,FromType.FROM_RENREN);
 			statement.execute(sql);
 			statement.close();
-			closeConnection();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally{
+			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
+			closeConnection();
+		}
+		
+	}
+	
+	public void addHotAlbum(AlbumInfo info){
+		ResultSet generatedKeys = null;
+		Statement statement = null;
+		try {
+			Connection connection = getConnection();
+			statement = connection.createStatement();
+			
+			AlbumContent albumContent=new AlbumContent();
+			albumContent.thumbImgUrl=info.mAlbumThumbUrl;
+			
+			Gson gson=new Gson();
+			String content=gson.toJson(albumContent);
+			
+			
+			String sql=String.format("INSERT INTO hot_album(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_ALBUM,info.mTitle,content,FromType.FROM_RENREN);
+			statement.execute(sql);
+			
+			generatedKeys = statement.getGeneratedKeys();
+			if(generatedKeys.next()){
+				long feed_id=generatedKeys.getLong(1);
+				
+				for (PicInfo pic : info.mPics) {
+					sql=String.format("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(%d,'%s','%s','%s')",feed_id,pic.mThumbUrl,pic.mBigUrl,pic.mDescription);
+					statement.execute(sql);
+				}
+			}else{
+				throw new SQLException("INSERT INTO hot_album failed!!");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			if (generatedKeys != null) try { generatedKeys.close(); } catch (SQLException logOrIgnore) {}
+			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
+			closeConnection();
 		}
 		
 	}
