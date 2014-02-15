@@ -21,9 +21,43 @@ public class TestJsoup {
 		
 		PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
 		picCrawler.start();
+		/*
+		Thread picThread=new Thread(){
+
+			@Override
+			public void run() {
+				PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
+				picCrawler.start();
+			}
+			
+		};
 		
-//		VideoCrawler videoCrawler=new VideoCrawler("http://share.renren.com/videolist/0");
-//		videoCrawler.start();
+		picThread.setName("picThread");
+		picThread.start();
+		
+		Thread videoThread=new Thread(){
+
+			@Override
+			public void run() {
+				VideoCrawler videoCrawler=new VideoCrawler("http://share.renren.com/videolist/0");
+				videoCrawler.start();
+			}
+			
+		};
+		
+		videoThread.setName("videoThread");
+		videoThread.start();
+		
+		
+		try {
+			videoThread.join();
+//			Thread.currentThread().wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		*/
 	}
 	
 	public static void getHotPics(String url,Integer count,int stackDeep){
