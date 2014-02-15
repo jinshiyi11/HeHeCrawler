@@ -19,9 +19,9 @@ public class TestJsoup {
 		
 //		getHotPics("http://share.renren.com/albumlist/0",0,0);
 		
-		PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
-		picCrawler.start();
-		/*
+//		PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
+//		picCrawler.start();
+		
 		Thread picThread=new Thread(){
 
 			@Override
@@ -57,7 +57,7 @@ public class TestJsoup {
 			e.printStackTrace();
 		}
 		
-		*/
+		
 	}
 	
 	public static void getHotPics(String url,Integer count,int stackDeep){

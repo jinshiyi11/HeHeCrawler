@@ -2,6 +2,10 @@ package com.shuai.hehe.crawler.data;
 
 public class Constants {
 	/**
+	 * 爬虫访问网络的超时时间，单位ms
+	 */
+	public static int JSOUP_TIMEOUT=30*1000;
+	/**
 	 * 新鲜事还未审核
 	 */
 	public static int FEED_STATE_UNCHECK=-1;

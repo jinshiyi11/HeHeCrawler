@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.shuai.hehe.crawler.data.AlbumInfo;
+import com.shuai.hehe.crawler.data.Constants;
 import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
@@ -62,7 +63,7 @@ public class PicCrawler {
 
 		Document doc;
 		try {
-			doc = Jsoup.connect(url).get();
+			doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
 			// System.out.print(doc);
 			Elements items = doc.select(".share-hot-list .share.clearfix");
 			
@@ -137,7 +138,7 @@ public class PicCrawler {
 
 		Document doc;
 		try {
-			doc = Jsoup.connect(albumUrl).get();
+			doc = Jsoup.connect(albumUrl).timeout(Constants.JSOUP_TIMEOUT).get();
 			// System.out.print(doc);
 			Elements items = doc.select("#albumThumbMode li");
 			for (Element item : items) {
@@ -190,7 +191,7 @@ public class PicCrawler {
 		String bigPicUrl = null;
 		
 		Document doc;
-		doc = Jsoup.connect(url).get();
+		doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
 		Elements elements=doc.select("#photoLink img");
 		if(elements.size()>0)
 			bigPicUrl=elements.get(0).attr("src");

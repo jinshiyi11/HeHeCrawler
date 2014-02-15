@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.shuai.hehe.crawler.data.Constants;
 import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.VideoInfo;
 
@@ -60,7 +61,7 @@ public class VideoCrawler {
 
 		Document doc;
 		try {
-			doc = Jsoup.connect(url).get();
+			doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
 			// System.out.print(doc);
 			Elements items = doc.select(".share-hot-list li");
 			
@@ -137,7 +138,7 @@ public class VideoCrawler {
 		 * alt="1.2;http://player.56.com/renrenshare_MTA1MDc5NDcx.swf" /></div>
 		 */
 		Document doc;
-		doc = Jsoup.connect(url).get();
+		doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
 		// Elements elements = doc.select("embed[src]");
 		// videoUrl = elements.get(0).attr("src");
 

@@ -20,13 +20,13 @@ public class DataManager {
 	private static String[] FEED_TABLES={"hot_feed","hot_album","hot_video"};
 	
 	private DataManager(){
-//		try {
-//			Class.forName("org.sqlite.JDBC");
-//		} catch (ClassNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			throw new RuntimeException();
-//		}
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException();
+		}
 		createDb();
 	}
 	
@@ -78,7 +78,7 @@ public class DataManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
+//			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
 			closeConnection(connection);
 		}
 	}
@@ -99,12 +99,17 @@ public class DataManager {
 		try {
 			if (connection != null){
 				connection.close();
-				connection=null;
+//				connection=null;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private String processStringForSqlite(String string){
+		//把单引号替换为2个单引号
+		return string.replace("'", "''");
 	}
 	
 	private static class VideoContent{
@@ -124,8 +129,6 @@ public class DataManager {
 	 */
 	public synchronized boolean isFeedExist(String tableName,String title){
 		boolean exist=false;
-		if(true)
-			return exist;
 		
 		Connection connection = null;
 		Statement statement = null;
@@ -134,15 +137,15 @@ public class DataManager {
 			connection = getConnection();
 			statement = connection.createStatement();
 			
-			resultSet = statement.executeQuery(String.format("select * from %s where title='%s' limit 1", tableName,title));
+			resultSet = statement.executeQuery(String.format("select * from %s where title='%s' limit 1", tableName,processStringForSqlite(title)));
 			if(resultSet.next())
 				exist=true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			if (resultSet != null) try { resultSet.close(); } catch (SQLException logOrIgnore) {}
-			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
+//			if (resultSet != null) try { resultSet.close(); } catch (SQLException logOrIgnore) {}
+//			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
 			closeConnection(connection);
 		}
 		return exist;
@@ -170,13 +173,13 @@ public class DataManager {
 			String content=gson.toJson(videoContent);
 			
 			
-			String sql=String.format("INSERT INTO hot_video(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_VIDEO,info.mTitle,content,FromType.FROM_RENREN);
+			String sql=String.format("INSERT INTO hot_video(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_VIDEO,processStringForSqlite(info.mTitle),processStringForSqlite(content),FromType.FROM_RENREN);
 			statement.execute(sql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
+//			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
 			closeConnection(connection);
 		}
 		
@@ -200,7 +203,7 @@ public class DataManager {
 			String content=gson.toJson(albumContent);
 			
 			
-			String sql=String.format("INSERT INTO hot_album(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_ALBUM,info.mTitle,content,FromType.FROM_RENREN);
+			String sql=String.format("INSERT INTO hot_album(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_ALBUM,processStringForSqlite(info.mTitle),processStringForSqlite(content),FromType.FROM_RENREN);
 			statement.execute(sql);
 			
 			generatedKeys = statement.getGeneratedKeys();
@@ -208,7 +211,7 @@ public class DataManager {
 				long feed_id=generatedKeys.getLong(1);
 				
 				for (PicInfo pic : info.mPics) {
-					sql=String.format("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(%d,'%s','%s','%s')",feed_id,pic.mThumbUrl,pic.mBigUrl,pic.mDescription);
+					sql=String.format("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(%d,'%s','%s','%s')",feed_id,processStringForSqlite(pic.mThumbUrl),processStringForSqlite(pic.mBigUrl),processStringForSqlite(pic.mDescription));
 					statement.execute(sql);
 				}
 			}else{
@@ -218,8 +221,8 @@ public class DataManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally{
-			if (generatedKeys != null) try { generatedKeys.close(); } catch (SQLException logOrIgnore) {}
-			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
+//			if (generatedKeys != null) try { generatedKeys.close(); } catch (SQLException logOrIgnore) {}
+//			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
 			closeConnection(connection);
 		}
 		
