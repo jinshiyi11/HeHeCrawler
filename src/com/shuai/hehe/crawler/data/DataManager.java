@@ -5,12 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
-
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
 public class DataManager {
@@ -90,7 +86,7 @@ public class DataManager {
 	}
 	
 	private Connection getConnection() throws SQLException{
-		Connection connection = DriverManager.getConnection("jdbc:sqlite:D:/mycode/hehe.db");
+		Connection connection = DriverManager.getConnection("jdbc:sqlite:D:/mycode/hehe_crawler.db");
 		
 		return connection;
 	}
