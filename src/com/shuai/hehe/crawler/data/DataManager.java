@@ -41,21 +41,28 @@ public class DataManager {
 							"content TEXT," +
 							"[from] INTEGER," +
 							"state INTEGER DEFAULT -1," +
-							"insert_time DATETIME DEFAULT (datetime('now','localtime')))",
+							"insert_time INTEGER DEFAULT (strftime('%s', 'now'))," +
+							"show_time INTEGER DEFAULT 0" +
+							")",
 							
 					"CREATE TABLE IF NOT EXISTS hot_video(id INTEGER PRIMARY KEY," +
 							"type INTEGER,title TEXT UNIQUE NOT NULL," +
 							"content TEXT," +
 							"[from] INTEGER," +
 							"state INTEGER DEFAULT -1," +
-							"insert_time DATETIME DEFAULT (datetime('now','localtime')))",
+							"insert_time INTEGER DEFAULT (strftime('%s', 'now'))," +
+							"show_time INTEGER DEFAULT 0" +
+							")",
 							
 					"CREATE TABLE IF NOT EXISTS pic(id INTEGER PRIMARY KEY," +
 							"feed_id INTEGER," +
 							"thumb_url TEXT," +
 							"big_url TEXT," +
 							"description TEXT," +
-							"insert_time DATETIME DEFAULT (datetime('now','localtime')))"};
+							"insert_time INTEGER DEFAULT (strftime('%s', 'now'))," +
+							"show_time INTEGER DEFAULT 0" +
+							")"
+							};
 			
 //			String[] indexs={"CREATE INDEX IF NOT EXISTS type_title_index ON hot_feed(type,title)"};
 			

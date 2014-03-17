@@ -66,44 +66,48 @@ public class VideoCrawler {
 			Elements items = doc.select(".share-hot-list li");
 			
 			System.out.println("pagecount:" + items.size());
-			for(Element element:items){
-				Element link = element.select("h3 a[href]").get(0);
-				//TODO:check
-				String title = link.ownText();
-				String href = link.attr("href");
-				String videoUrl=getVideoUrl(href);
-				
-				Element div=element.select(".content .video").get(0);
-				/*
-				 <div style="background-image: url('http://v3.pfs.56img.com/images/26/24/jasperci56olo56i56.com_sc_13902076340hd.jpg')" class="video">
-				 <a href="http://share.renren.com/share/406776768/16865052333" target="_blank" onclick="shareLog('list', 'click', 3)">播放</a>
-				 </div>
-				 */
-				String style=div.attr("style");
-				int beginIndex=style.indexOf("('");
-				if(beginIndex==-1)
-					throw new RuntimeException();
-				
-				beginIndex+=2;
-				
-				int endIndex=style.indexOf("')");
-				if(endIndex==-1)
-					throw new RuntimeException();
-				
-				String thumbImgUrl=style.substring(beginIndex, endIndex);
-				
-				System.out.println("count:" + ++mVideoCount);
-				
-				System.out.println();
-				System.out.println(title);
-				System.out.println(videoUrl);
-				System.out.println(thumbImgUrl);
-				
-				VideoInfo info=new VideoInfo();
-				info.mTitle=title;
-				info.mVideoThumbUrl=thumbImgUrl;
-				info.mVideoUrl=videoUrl;
-				DataManager.getInstance().addHotVideo(info);
+			for (Element element : items) {
+				try {
+					Element link = element.select("h3 a[href]").get(0);
+					// TODO:check
+					String title = link.ownText();
+					String href = link.attr("href");
+					String videoUrl = getVideoUrl(href);
+
+					Element div = element.select(".content .video").get(0);
+/*
+ <div style="background-image: url('http://v3.pfs.56img.com/images/26/24/jasperci56olo56i56.com_sc_13902076340hd.jpg')" class="video">
+ <a href="http://share.renren.com/share/406776768/16865052333" target="_blank" onclick="shareLog('list', 'click', 3)">播放</a>
+ </div>
+ */
+					String style = div.attr("style");
+					int beginIndex = style.indexOf("('");
+					if (beginIndex == -1)
+						throw new RuntimeException();
+
+					beginIndex += 2;
+
+					int endIndex = style.indexOf("')");
+					if (endIndex == -1)
+						throw new RuntimeException();
+
+					String thumbImgUrl = style.substring(beginIndex, endIndex);
+
+					System.out.println("count:" + ++mVideoCount);
+
+					System.out.println();
+					System.out.println(title);
+					System.out.println(videoUrl);
+					System.out.println(thumbImgUrl);
+
+					VideoInfo info = new VideoInfo();
+					info.mTitle = title;
+					info.mVideoThumbUrl = thumbImgUrl;
+					info.mVideoUrl = videoUrl;
+					DataManager.getInstance().addHotVideo(info);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
 			}
 			
 
