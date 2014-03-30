@@ -7,41 +7,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.google.gson.Gson;
-import java.sql.PreparedStatement;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
-public class DataManager {
+public class SqliteDataManager {
 	
-	private static DataManager mDataManager;
+	private static SqliteDataManager mDataManager;
 	
 	private static String[] FEED_TABLES={"hot_feed","hot_album","hot_video"};
 	
-	private boolean debug=true;
-	
-	private String mDbName;
-	private String mDbUserName;
-	private String mDbPassword;
-	private String mDbHost;
-	private int mDbPort;
-	
-	private static String mDriverName="com.mysql.jdbc.Driver";//"org.sqlite.JDBC"
-	
-	{
-		if (debug) {
-			mDbName = "hehe";
-			mDbUserName="hot_feed_user";
-			mDbPassword="test";
-			mDbHost="localhost";
-			mDbPort=3306;
-		}else{
-			
-		}
-		
-	}
-	
-	private DataManager(){
+	private SqliteDataManager(){
 		try {
-			Class.forName(mDriverName);
+			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -60,31 +36,31 @@ public class DataManager {
 			connection=getConnection();
 			
 			String[] sqls={
-					"CREATE TABLE IF NOT EXISTS hot_album(id INT NOT NULL AUTO_INCREMENT  PRIMARY KEY," +
-							"type INT,title VARCHAR(255) NOT NULL UNIQUE," +
+					"CREATE TABLE IF NOT EXISTS hot_album(id INTEGER PRIMARY KEY," +
+							"type INTEGER,title TEXT UNIQUE NOT NULL," +
 							"content TEXT," +
-							"`from` INT," +
-							"state INT DEFAULT -1," +
-							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
-							"show_time INT DEFAULT 0" +
+							"[from] INTEGER," +
+							"state INTEGER DEFAULT -1," +
+							"insert_time INTEGER DEFAULT (strftime('%s', 'now'))," +
+							"show_time INTEGER DEFAULT 0" +
 							")",
 							
-					"CREATE TABLE IF NOT EXISTS hot_video(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-							"type INT,title VARCHAR(255) NOT NULL UNIQUE," +
+					"CREATE TABLE IF NOT EXISTS hot_video(id INTEGER PRIMARY KEY," +
+							"type INTEGER,title TEXT UNIQUE NOT NULL," +
 							"content TEXT," +
-							"`from` INT," +
-							"state INT DEFAULT -1," +
-							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
-							"show_time INT DEFAULT 0" +
+							"[from] INTEGER," +
+							"state INTEGER DEFAULT -1," +
+							"insert_time INTEGER DEFAULT (strftime('%s', 'now'))," +
+							"show_time INTEGER DEFAULT 0" +
 							")",
 							
-					"CREATE TABLE IF NOT EXISTS pic(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-							"feed_id INT," +
+					"CREATE TABLE IF NOT EXISTS pic(id INTEGER PRIMARY KEY," +
+							"feed_id INTEGER," +
 							"thumb_url TEXT," +
 							"big_url TEXT," +
 							"description TEXT," +
-							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
-							"show_time INT DEFAULT 0" +
+							"insert_time INTEGER DEFAULT (strftime('%s', 'now'))," +
+							"show_time INTEGER DEFAULT 0" +
 							")"
 							};
 			
@@ -110,18 +86,14 @@ public class DataManager {
 		}
 	}
 	
-	public static synchronized  DataManager getInstance(){
+	public static synchronized  SqliteDataManager getInstance(){
 		if(mDataManager==null)
-			mDataManager=new DataManager();
+			mDataManager=new SqliteDataManager();
 		return mDataManager;
 	}
 	
 	private Connection getConnection() throws SQLException{
-		//Connection connection = DriverManager.getConnection("jdbc:sqlite:D:/mycode/hehe_crawler.db");
-	
-		//jdbc:mysql://localhost:3306/dbname?user=sqluser&password=sqluserpw
-		String connectionString=String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s", mDbHost,mDbPort,mDbName,mDbUserName,mDbPassword);
-		Connection connection = DriverManager.getConnection(connectionString);
+		Connection connection = DriverManager.getConnection("jdbc:sqlite:D:/mycode/hehe_crawler.db");
 		
 		return connection;
 	}
@@ -138,7 +110,6 @@ public class DataManager {
 		}
 	}
 	
-	//TODO:除了单引号，还有其它字符也应该处理. http://stackoverflow.com/questions/881194/how-to-escape-special-character-in-mysql
 	private String processStringForSqlite(String string){
 		//把单引号替换为2个单引号
 		return string.replace("'", "''");
@@ -192,9 +163,10 @@ public class DataManager {
 			return;
 		
 		Connection connection = null;
-		PreparedStatement statement = null;
+		Statement statement = null;
 		try {
 			connection = getConnection();
+			statement = connection.createStatement();
 			
 			VideoContent videoContent=new VideoContent();
 			videoContent.videoUrl=info.mVideoUrl;
@@ -203,12 +175,9 @@ public class DataManager {
 			Gson gson=new Gson();
 			String content=gson.toJson(videoContent);
 			
-			statement=connection.prepareStatement("INSERT INTO hot_video(type,title,content,`from`) values(?,?,?,?)");
-			statement.setInt(1, FeedType.TYPE_VIDEO);
-			statement.setString(2, processStringForSqlite(info.mTitle));
-			statement.setString(3, processStringForSqlite(content));
-			statement.setInt(4, FromType.FROM_RENREN);
-			statement.executeUpdate();
+			
+			String sql=String.format("INSERT INTO hot_video(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_VIDEO,processStringForSqlite(info.mTitle),processStringForSqlite(content),FromType.FROM_RENREN);
+			statement.execute(sql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -225,9 +194,10 @@ public class DataManager {
 		
 		Connection connection = null;
 		ResultSet generatedKeys = null;
-		PreparedStatement statement = null;
+		Statement statement = null;
 		try {
 			connection = getConnection();
+			statement = connection.createStatement();
 			
 			AlbumContent albumContent=new AlbumContent();
 			albumContent.thumbImgUrl=info.mAlbumThumbUrl;
@@ -235,24 +205,17 @@ public class DataManager {
 			Gson gson=new Gson();
 			String content=gson.toJson(albumContent);
 			
-			statement=connection.prepareStatement("INSERT INTO hot_album(type,title,content,`from`) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-			statement.setInt(1, FeedType.TYPE_ALBUM);
-			statement.setString(2, processStringForSqlite(info.mTitle));
-			statement.setString(3, processStringForSqlite(content));
-			statement.setInt(4, FromType.FROM_RENREN);
-			statement.executeUpdate();
+			
+			String sql=String.format("INSERT INTO hot_album(type,title,content,[from]) values(%d,'%s','%s',%d)",FeedType.TYPE_ALBUM,processStringForSqlite(info.mTitle),processStringForSqlite(content),FromType.FROM_RENREN);
+			statement.execute(sql);
 			
 			generatedKeys = statement.getGeneratedKeys();
 			if(generatedKeys.next()){
 				long feed_id=generatedKeys.getLong(1);
 				
 				for (PicInfo pic : info.mPics) {
-					statement=connection.prepareStatement("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(?,?,?,?)");
-					statement.setInt(1, (int) feed_id);
-					statement.setString(2, processStringForSqlite(pic.mThumbUrl));
-					statement.setString(3, processStringForSqlite(pic.mBigUrl));
-					statement.setString(4, processStringForSqlite(pic.mDescription));
-					statement.executeUpdate();
+					sql=String.format("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(%d,'%s','%s','%s')",feed_id,processStringForSqlite(pic.mThumbUrl),processStringForSqlite(pic.mBigUrl),processStringForSqlite(pic.mDescription));
+					statement.execute(sql);
 				}
 			}else{
 				throw new SQLException("INSERT INTO hot_album failed!!");

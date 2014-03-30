@@ -106,7 +106,7 @@ public class VideoCrawler {
 					info.mVideoUrl = videoUrl;
 					DataManager.getInstance().addHotVideo(info);
 				} catch (IOException ex) {
-					ex.printStackTrace();
+					//ex.printStackTrace();
 				}
 			}
 			
