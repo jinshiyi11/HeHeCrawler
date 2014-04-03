@@ -7,21 +7,21 @@ public class FeedType {
 	/**
 	 * 相册
 	 */
-	public static int TYPE_ALBUM=1;
+	public static final int TYPE_ALBUM=1;
 	
 	/**
 	 * 视频
 	 */
-	public static int TYPE_VIDEO=2;
+	public static final int TYPE_VIDEO=2;
 	
 	/**
 	 * 日志
 	 */
-	public static int TYPE_BLOG=3;
+	public static final int TYPE_BLOG=3;
 	
 	/**
 	 * 语音
 	 */
-	public static int TYPE_SOUND=4;
+	public static final int TYPE_SOUND=4;
 
 }

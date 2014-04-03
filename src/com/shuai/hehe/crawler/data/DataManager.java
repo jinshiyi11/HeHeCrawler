@@ -2,12 +2,12 @@ package com.shuai.hehe.crawler.data;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.google.gson.Gson;
-import java.sql.PreparedStatement;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
 public class DataManager {
@@ -60,13 +60,13 @@ public class DataManager {
 			connection=getConnection();
 			
 			String[] sqls={
-					"CREATE TABLE IF NOT EXISTS hot_album(id INT NOT NULL AUTO_INCREMENT  PRIMARY KEY," +
+					"CREATE TABLE IF NOT EXISTS hot_album(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
 							"type INT,title VARCHAR(255) NOT NULL UNIQUE," +
 							"content TEXT," +
 							"`from` INT," +
 							"state INT DEFAULT -1," +
 							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
-							"show_time INT DEFAULT 0" +
+							"show_time TIMESTAMP DEFAULT  0" +
 							")",
 							
 					"CREATE TABLE IF NOT EXISTS hot_video(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
@@ -75,7 +75,7 @@ public class DataManager {
 							"`from` INT," +
 							"state INT DEFAULT -1," +
 							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
-							"show_time INT DEFAULT 0" +
+							"show_time TIMESTAMP DEFAULT 0" +
 							")",
 							
 					"CREATE TABLE IF NOT EXISTS pic(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
@@ -84,7 +84,7 @@ public class DataManager {
 							"big_url TEXT," +
 							"description TEXT," +
 							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
-							"show_time INT DEFAULT 0" +
+							"show_time TIMESTAMP DEFAULT 0" +
 							")"
 							};
 			
@@ -96,7 +96,7 @@ public class DataManager {
 				statement.execute(sql);				
 			}
 			
-			//创建索引
+//			创建索引
 //			for(String sql:indexs){
 //				statement.execute(sql);				
 //			}
@@ -207,7 +207,7 @@ public class DataManager {
 			statement.setInt(1, FeedType.TYPE_VIDEO);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
-			statement.setInt(4, FromType.FROM_RENREN);
+			statement.setInt(4, info.mFromType);
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -219,6 +219,10 @@ public class DataManager {
 		
 	}
 	
+	/**
+	 * 添加一个相册信息
+	 * @param info
+	 */
 	public void addHotAlbum(AlbumInfo info){
 		if(isFeedExist("hot_album",info.mTitle))
 			return;
@@ -239,7 +243,7 @@ public class DataManager {
 			statement.setInt(1, FeedType.TYPE_ALBUM);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
-			statement.setInt(4, FromType.FROM_RENREN);
+			statement.setInt(4, info.mFromType);
 			statement.executeUpdate();
 			
 			generatedKeys = statement.getGeneratedKeys();

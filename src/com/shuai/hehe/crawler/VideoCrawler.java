@@ -9,6 +9,7 @@ import org.jsoup.select.Elements;
 
 import com.shuai.hehe.crawler.data.Constants;
 import com.shuai.hehe.crawler.data.DataManager;
+import com.shuai.hehe.crawler.data.FromType;
 import com.shuai.hehe.crawler.data.VideoInfo;
 
 /**
@@ -104,6 +105,7 @@ public class VideoCrawler {
 					info.mTitle = title;
 					info.mVideoThumbUrl = thumbImgUrl;
 					info.mVideoUrl = videoUrl;
+					info.mFromType=FromType.FROM_RENREN;
 					DataManager.getInstance().addHotVideo(info);
 				} catch (IOException ex) {
 					//ex.printStackTrace();

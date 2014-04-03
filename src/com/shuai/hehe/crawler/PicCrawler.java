@@ -11,6 +11,7 @@ import com.shuai.hehe.crawler.data.AlbumInfo;
 import com.shuai.hehe.crawler.data.Constants;
 import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
+import com.shuai.hehe.crawler.data.FromType;
 
 /**
  * 热门相册爬虫
@@ -113,6 +114,7 @@ public class PicCrawler {
 		AlbumInfo albumInfo=new AlbumInfo();
 		albumInfo.mTitle=albumTitle;
 		albumInfo.mAlbumThumbUrl=albumThumbUrl;
+		albumInfo.mFromType=FromType.FROM_RENREN;
 		
 		System.out.print(String.format("正在爬取相册图片\n相册名：%s\nurl:%s\n缩略图:%s\n",albumTitle,albumUrl,albumThumbUrl));
 		getAlbumPics(albumUrl,albumInfo);

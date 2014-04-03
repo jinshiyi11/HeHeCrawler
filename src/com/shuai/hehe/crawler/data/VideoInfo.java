@@ -18,5 +18,10 @@ public class VideoInfo {
 	 * 视频url
 	 */
 	public String mVideoUrl;
+	
+	/**
+	 * 新鲜事来源
+	 */
+	public int mFromType=FromType.FROM_RENREN;
 
 }

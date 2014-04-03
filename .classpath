@@ -9,5 +9,8 @@
 	<classpathentry kind="lib" path="libs/gson-2.2.4-javadoc.jar"/>
 	<classpathentry kind="lib" path="libs/gson-2.2.4.jar"/>
 	<classpathentry kind="lib" path="libs/mysql-connector-java-5.1.15-bin.jar"/>
+	<classpathentry kind="lib" path="libs/httpclient-4.3.3.jar" sourcepath="D:/soft/httpclient/httpcomponents-client-4.3.3-src.zip"/>
+	<classpathentry kind="lib" path="libs/httpclient-cache-4.3.3.jar"/>
+	<classpathentry kind="lib" path="libs/httpcore-4.3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

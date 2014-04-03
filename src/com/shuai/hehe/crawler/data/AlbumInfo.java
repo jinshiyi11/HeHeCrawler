@@ -17,6 +17,11 @@ public class AlbumInfo {
 	public String mAlbumThumbUrl;
 	
 	/**
+	 * 新鲜事来源
+	 */
+	public int mFromType=FromType.FROM_RENREN;
+	
+	/**
 	 * 相册里面的相片
 	 */
 	public ArrayList<PicInfo> mPics=new ArrayList<AlbumInfo.PicInfo>();
