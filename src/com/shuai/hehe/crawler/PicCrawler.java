@@ -59,8 +59,8 @@ public class PicCrawler {
 
 		++mPageCount;
 
-		if (mPageCount > 10)
-			return;
+//		if (mPageCount > 10)
+//			return;
 
 		Document doc;
 		try {
@@ -81,8 +81,9 @@ public class PicCrawler {
 					System.out.println(title);
 					System.out.println(href);
 					System.out.println("count:" + ++mAlbumCount);
-					getAlbumInfo(href,title,thumbUrl);
+                    AlbumInfo albumInfo = getAlbumInfo(href, title, thumbUrl);
 
+                    DataManager.getInstance().addHotAlbum(albumInfo);
 				}
 
 			}
@@ -110,18 +111,17 @@ public class PicCrawler {
 	 * @param albumTitle
 	 * @param albumThumbUrl
 	 */
-	private void getAlbumInfo(String albumUrl, String albumTitle,String albumThumbUrl){
-		AlbumInfo albumInfo=new AlbumInfo();
-		albumInfo.mTitle=albumTitle;
-		albumInfo.mAlbumThumbUrl=albumThumbUrl;
-		albumInfo.mFromType=FromType.FROM_RENREN;
-		
-		System.out.print(String.format("正在爬取相册图片\n相册名：%s\nurl:%s\n缩略图:%s\n",albumTitle,albumUrl,albumThumbUrl));
-		getAlbumPics(albumUrl,albumInfo);
-		
-		DataManager.getInstance().addHotAlbum(albumInfo);
-		
-		System.out.println(String.format("相册:%s包含%d张图片",albumTitle,albumInfo.mPics.size()));
+	private AlbumInfo getAlbumInfo(String albumUrl, String albumTitle,String albumThumbUrl){
+        AlbumInfo albumInfo = new AlbumInfo();
+        albumInfo.mTitle = albumTitle;
+        albumInfo.mAlbumThumbUrl = albumThumbUrl;
+        albumInfo.mFromType = FromType.FROM_RENREN;
+
+        System.out.print(String.format("正在爬取相册图片\n相册名：%s\nurl:%s\n缩略图:%s\n", albumTitle, albumUrl, albumThumbUrl));
+        getAlbumPics(albumUrl, albumInfo);
+
+        System.out.println(String.format("相册:%s包含%d张图片", albumTitle, albumInfo.mPics.size()));
+        return albumInfo;
 	}
 
 	/**

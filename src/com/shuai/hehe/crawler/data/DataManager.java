@@ -60,22 +60,13 @@ public class DataManager {
 			connection=getConnection();
 			
 			String[] sqls={
-					"CREATE TABLE IF NOT EXISTS hot_album(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+					"CREATE TABLE IF NOT EXISTS hot_feed(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
 							"type INT,title VARCHAR(255) NOT NULL UNIQUE," +
 							"content TEXT," +
 							"`from` INT," +
 							"state INT DEFAULT -1," +
 							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
 							"show_time TIMESTAMP DEFAULT  0" +
-							")",
-							
-					"CREATE TABLE IF NOT EXISTS hot_video(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-							"type INT,title VARCHAR(255) NOT NULL UNIQUE," +
-							"content TEXT," +
-							"`from` INT," +
-							"state INT DEFAULT -1," +
-							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
-							"show_time TIMESTAMP DEFAULT 0" +
 							")",
 							
 					"CREATE TABLE IF NOT EXISTS pic(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
@@ -188,7 +179,7 @@ public class DataManager {
 	 * @param info
 	 */
 	public void addHotVideo(VideoInfo info) {
-		if(isFeedExist("hot_video",info.mTitle))
+		if(isFeedExist("hot_feed",info.mTitle))
 			return;
 		
 		Connection connection = null;
@@ -203,7 +194,7 @@ public class DataManager {
 			Gson gson=new Gson();
 			String content=gson.toJson(videoContent);
 			
-			statement=connection.prepareStatement("INSERT INTO hot_video(type,title,content,`from`) values(?,?,?,?)");
+			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`) values(?,?,?,?)");
 			statement.setInt(1, FeedType.TYPE_VIDEO);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
@@ -224,7 +215,7 @@ public class DataManager {
 	 * @param info
 	 */
 	public void addHotAlbum(AlbumInfo info){
-		if(isFeedExist("hot_album",info.mTitle))
+		if(isFeedExist("hot_feed",info.mTitle))
 			return;
 		
 		Connection connection = null;
@@ -239,7 +230,7 @@ public class DataManager {
 			Gson gson=new Gson();
 			String content=gson.toJson(albumContent);
 			
-			statement=connection.prepareStatement("INSERT INTO hot_album(type,title,content,`from`) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 			statement.setInt(1, FeedType.TYPE_ALBUM);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
@@ -259,7 +250,7 @@ public class DataManager {
 					statement.executeUpdate();
 				}
 			}else{
-				throw new SQLException("INSERT INTO hot_album failed!!");
+				throw new SQLException("INSERT INTO hot_feed failed!!");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
