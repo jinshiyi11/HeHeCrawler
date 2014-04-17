@@ -8,9 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.shuai.hehe.crawler.data.AlbumInfo;
-import com.shuai.hehe.crawler.data.Constants;
-import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
+import com.shuai.hehe.crawler.data.Constants;
 import com.shuai.hehe.crawler.data.FromType;
 
 /**
@@ -34,20 +33,44 @@ public class PicCrawler {
 	private int mPageCount;
 	
 	private static int MAX_ALBUM_COUNT=1;
+	
+	private CrawlerMananger mCrawlerMananger=CrawlerMananger.getInstance();
+	
+    private class SubPicCrawler implements Runnable {
+        String title;
+        String href;
+        String thumbUrl;
+
+        public SubPicCrawler(String href, String title, String thumbUrl) {
+            this.href = href;
+            this.title = title;
+            this.thumbUrl = thumbUrl;
+        }
+
+        @Override
+        public void run() {
+            Thread.currentThread().setName("SubPicCrawler");
+            AlbumInfo albumInfo = getAlbumInfo(href, title, thumbUrl);
+            mCrawlerMananger.addAlbum(albumInfo);
+        }
+    }
 
 	public PicCrawler(String startUrl) {
 		mStartUrl = startUrl;
 	}
 
 	public void start() {
-		getAlbums(mStartUrl);
+	    String url=mStartUrl;
+        while (url!=null && url.length()>0) {
+            url=getAlbums(url);
+        }
 	}
 
 	/**
 	 * 获取该页面包含的相册
 	 * @param url 从该页面爬取相册
 	 */
-	private void getAlbums(String url) {
+	private String getAlbums(String url) {
 		if (url == null)
 			new IllegalArgumentException();
 
@@ -69,24 +92,23 @@ public class PicCrawler {
 			Elements items = doc.select(".share-hot-list .share.clearfix");
 			
 			System.out.println("pagecount:" + items.size());
-			for(Element element:items){
-				Element link = element.select("h3 a[href]").get(0);
-				//TODO:check
-				String title = link.ownText();
-				String href = link.attr("href");
-				
-				Element img=element.select(".content .photos img").get(0);
-				String thumbUrl=img.attr("src");
-				if (href.startsWith("http://share.renren.com/")) {
-					System.out.println(title);
-					System.out.println(href);
-					System.out.println("count:" + ++mAlbumCount);
-                    AlbumInfo albumInfo = getAlbumInfo(href, title, thumbUrl);
+            for (Element element : items) {
+                Element link = element.select("h3 a[href]").get(0);
+                //TODO:check
+                String title = link.ownText();
+                String href = link.attr("href");
 
-                    DataManager.getInstance().addHotAlbum(albumInfo);
-				}
+                Element img = element.select(".content .photos img").get(0);
+                String thumbUrl = img.attr("src");
+                if (href.startsWith("http://share.renren.com/")) {
+                    System.out.println(title);
+                    System.out.println(href);
+                    System.out.println("count:" + ++mAlbumCount);
+                    
+                    mCrawlerMananger.getExecutor().execute(new SubPicCrawler(href, title, thumbUrl));
+                }
 
-			}
+            }
 			
 
 			Elements elements = doc.select(".pagerpro a[title=下一页]");
@@ -98,11 +120,13 @@ public class PicCrawler {
 				// System.out.println();
 				// System.out.println();
 
-				getAlbums(nextPageUrl);
+				return nextPageUrl;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return null;
 	}
 	
 	/**

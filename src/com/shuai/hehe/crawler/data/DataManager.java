@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 import com.google.gson.Gson;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
@@ -34,7 +35,7 @@ public class DataManager {
 			mDbHost="localhost";
 			mDbPort=3306;
 		}else{
-			
+		    
 		}
 		
 	}
@@ -194,11 +195,12 @@ public class DataManager {
 			Gson gson=new Gson();
 			String content=gson.toJson(videoContent);
 			
-			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`) values(?,?,?,?)");
+			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`,show_time) values(?,?,?,?,?)");
 			statement.setInt(1, FeedType.TYPE_VIDEO);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
 			statement.setInt(4, info.mFromType);
+			statement.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -208,6 +210,25 @@ public class DataManager {
 			closeConnection(connection);
 		}
 		
+        try{
+        synchronized (this) {
+            
+            notify();
+        }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        
+
+        try {
+            synchronized (this) {
+                wait();
+            }
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 	}
 	
 	/**
@@ -230,11 +251,12 @@ public class DataManager {
 			Gson gson=new Gson();
 			String content=gson.toJson(albumContent);
 			
-			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`,show_time) values(?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 			statement.setInt(1, FeedType.TYPE_ALBUM);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
 			statement.setInt(4, info.mFromType);
+			statement.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
 			statement.executeUpdate();
 			
 			generatedKeys = statement.getGeneratedKeys();
@@ -260,6 +282,27 @@ public class DataManager {
 //			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
 			closeConnection(connection);
 		}
+		
+		try{
+		synchronized (this) {
+            
+            notify();
+		}
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        
+
+        try {
+            synchronized (this) {
+                wait();
+            }
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+			
 		
 	}
 

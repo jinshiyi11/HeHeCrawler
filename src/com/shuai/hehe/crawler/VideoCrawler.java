@@ -38,14 +38,18 @@ public class VideoCrawler {
 	}
 
 	public void start() {
-		getVideos(mStartUrl);
+	    String url=mStartUrl;
+	    while (url!=null && url.length()>0) {
+	        url=getVideos(url);
+        }
+		
 	}
 	
 	/**
 	 * 获取该页面包含的视频
 	 * @param url 从该页面爬取视频
 	 */
-	private void getVideos(String url) {
+	private String getVideos(String url) {
 		if (url == null)
 			new IllegalArgumentException();
 
@@ -106,7 +110,8 @@ public class VideoCrawler {
 					info.mVideoThumbUrl = thumbImgUrl;
 					info.mVideoUrl = videoUrl;
 					info.mFromType=FromType.FROM_RENREN;
-					DataManager.getInstance().addHotVideo(info);
+					
+					CrawlerMananger.getInstance().addVideo(info);
 				} catch (IOException ex) {
 					//ex.printStackTrace();
 				}
@@ -122,11 +127,12 @@ public class VideoCrawler {
 				// System.out.println();
 				// System.out.println();
 
-				getVideos(nextPageUrl);
+				return nextPageUrl;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+        return null;
 	}
 	
 	/**
