@@ -64,6 +64,8 @@ public class PicCrawler {
         while (url!=null && url.length()>0) {
             url=getAlbums(url);
         }
+        
+        System.out.println("pic crawler finished!!");
 	}
 
 	/**

@@ -78,6 +78,8 @@ public class VideoCrawler {
 					String title = link.ownText();
 					String href = link.attr("href");
 					String videoUrl = getVideoUrl(href);
+					if(videoUrl==null)
+					    continue;
 
 					Element div = element.select(".content .video").get(0);
 /*
@@ -156,7 +158,10 @@ public class VideoCrawler {
 
 		Elements elements = doc.select(".videoimg");
 		videoUrl = elements.get(0).attr("alt");
-		videoUrl = videoUrl.substring(videoUrl.indexOf("http:"));
+		if(videoUrl.contains("http:")){
+		    videoUrl = videoUrl.substring(videoUrl.indexOf("http:"));
+		}
+		
 		return videoUrl;
 	}
 

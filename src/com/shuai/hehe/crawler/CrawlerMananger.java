@@ -11,6 +11,10 @@ import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.VideoInfo;
 
 public class CrawlerMananger {
+    private static final int CORE_POOL_SIZE = 3;
+    private static final int MAXIMUM_POOL_SIZE = 15;//6;
+    private static final int KEEP_ALIVE = 5;
+    
     private static CrawlerMananger mCrawlerMananger;
     
     private Executor mExecutor;
@@ -19,12 +23,13 @@ public class CrawlerMananger {
     private LinkedBlockingQueue<VideoInfo> mVideoInfos=new LinkedBlockingQueue<VideoInfo>();
 
     private CrawlerMananger() {
-        mExecutor=new ThreadPoolExecutor(3, 6, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(10));
+        mExecutor=new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(Integer.MAX_VALUE));
         
         mExecutor.execute(new Runnable() {
             
             @Override
             public void run() {
+                Thread.currentThread().setName("DB Thread");
                 processFeed();
             }
         });
@@ -39,6 +44,16 @@ public class CrawlerMananger {
     }
     
     public Executor getExecutor() {
+        int queueSize=((ThreadPoolExecutor)mExecutor).getQueue().size();
+        System.out.println("CrawlerMananger queue size:"+queueSize);
+        if (queueSize > 500) {
+            try {
+                Thread.currentThread().sleep(50);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
         return mExecutor;
     }
     

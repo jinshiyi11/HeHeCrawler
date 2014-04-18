@@ -57,7 +57,6 @@ public class TestJsoup {
 			e.printStackTrace();
 		}
 		
-		
 	}
 	
 	public static void getHotPics(String url,Integer count,int stackDeep){
