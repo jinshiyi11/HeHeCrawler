@@ -11,8 +11,8 @@ import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.VideoInfo;
 
 public class CrawlerMananger {
-    private static final int CORE_POOL_SIZE = 3;
-    private static final int MAXIMUM_POOL_SIZE = 15;//6;
+    private static final int CORE_POOL_SIZE = 2;
+    private static final int MAXIMUM_POOL_SIZE = 5;//6;
     private static final int KEEP_ALIVE = 5;
     
     private static CrawlerMananger mCrawlerMananger;

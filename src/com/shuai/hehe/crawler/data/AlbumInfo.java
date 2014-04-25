@@ -12,9 +12,14 @@ public class AlbumInfo {
 	public String mTitle;
 	
 	/**
-	 * 相册缩略图url
+	 * 相册封面缩略图url
 	 */
 	public String mAlbumThumbUrl;
+	
+	/**
+     * 相册封面图片url
+     */
+    public String mAlbumPicUrl;
 	
 	/**
 	 * 新鲜事来源

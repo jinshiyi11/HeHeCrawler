@@ -143,6 +143,7 @@ public class DataManager {
 	
 	private static class AlbumContent{
 		String thumbImgUrl;
+		String bigImgUrl;
 	}
 	
 	/**
@@ -209,26 +210,7 @@ public class DataManager {
 //			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
 			closeConnection(connection);
 		}
-		
-        try{
-        synchronized (this) {
-            
-            notify();
-        }
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        
 
-        try {
-            synchronized (this) {
-                wait();
-            }
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 	}
 	
 	/**
@@ -247,6 +229,7 @@ public class DataManager {
 			
 			AlbumContent albumContent=new AlbumContent();
 			albumContent.thumbImgUrl=info.mAlbumThumbUrl;
+			albumContent.bigImgUrl=info.mAlbumPicUrl;
 			
 			Gson gson=new Gson();
 			String content=gson.toJson(albumContent);
@@ -282,27 +265,6 @@ public class DataManager {
 //			if (statement != null) try { statement.close(); } catch (SQLException logOrIgnore) {}
 			closeConnection(connection);
 		}
-		
-		try{
-		synchronized (this) {
-            
-            notify();
-		}
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        
-
-        try {
-            synchronized (this) {
-                wait();
-            }
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-			
 		
 	}
 

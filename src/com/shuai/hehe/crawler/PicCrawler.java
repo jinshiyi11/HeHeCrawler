@@ -1,6 +1,7 @@
 package com.shuai.hehe.crawler;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -53,6 +54,7 @@ public class PicCrawler {
             AlbumInfo albumInfo = getAlbumInfo(href, title, thumbUrl);
             mCrawlerMananger.addAlbum(albumInfo);
         }
+        
     }
 
 	public PicCrawler(String startUrl) {
@@ -145,9 +147,51 @@ public class PicCrawler {
 
         System.out.print(String.format("正在爬取相册图片\n相册名：%s\nurl:%s\n缩略图:%s\n", albumTitle, albumUrl, albumThumbUrl));
         getAlbumPics(albumUrl, albumInfo);
+        
+        //从所有相册图片中查找相册封面缩略图对应的大图的url
+        boolean found=false;
+        for (AlbumInfo.PicInfo picInfo : albumInfo.mPics) {
+            String bigUrl = picInfo.mBigUrl;
+            if(isBigPicUrl(bigUrl, albumInfo.mAlbumThumbUrl)){
+                found=true;
+                albumInfo.mAlbumPicUrl=bigUrl;
+                break;
+            }
+        }
+        
+        if(!found){
+            //没找到大图，只能用缩略图了
+            albumInfo.mAlbumPicUrl=albumInfo.mAlbumThumbUrl;
+        }
 
         System.out.println(String.format("相册:%s包含%d张图片", albumTitle, albumInfo.mPics.size()));
         return albumInfo;
+	}
+	
+	private boolean isBigPicUrl(String bigPicUrl,String thumbPicUrl){
+	    /**
+	     * 小图url：http://fmn.rrimg.com/xxx/head_xxx.jpg
+	     * 大图url：http://fmn.rrimg.com/xxx/original_xxx.jpg(后缀也有可能是其它的，比如gif)
+	     */
+	    if(bigPicUrl==null || thumbPicUrl==null)
+	        return false;
+	    
+	    int bigSlashIndex=bigPicUrl.lastIndexOf('/');
+	    int thumbSlashIndex=thumbPicUrl.lastIndexOf('/');
+	    if(bigSlashIndex==-1 || bigSlashIndex!=thumbSlashIndex)
+	        return false;
+	    
+	    try {
+	        String bigPart=bigPicUrl.substring(bigPicUrl.indexOf('_', bigSlashIndex), bigPicUrl.lastIndexOf('.'));
+	        String thumbPart=thumbPicUrl.substring(thumbPicUrl.indexOf('_', thumbSlashIndex), thumbPicUrl.lastIndexOf('.'));
+            if(bigPart.compareToIgnoreCase(thumbPart)==0)
+                return true;
+            else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
 	}
 
 	/**
