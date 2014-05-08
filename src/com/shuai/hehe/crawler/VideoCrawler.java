@@ -73,12 +73,13 @@ public class VideoCrawler {
 			System.out.println("pagecount:" + items.size());
 			for (Element element : items) {
 				try {
+				    VideoInfo info = new VideoInfo();
 					Element link = element.select("h3 a[href]").get(0);
 					// TODO:check
 					String title = link.ownText();
 					String href = link.attr("href");
-					String videoUrl = getVideoUrl(href);
-					if(videoUrl==null)
+					getVideoUrl(href,info);
+					if(info.mVideoUrl==null)
 					    continue;
 
 					Element div = element.select(".content .video").get(0);
@@ -104,13 +105,12 @@ public class VideoCrawler {
 
 					System.out.println();
 					System.out.println(title);
-					System.out.println(videoUrl);
+					System.out.println(info.mVideoUrl);
 					System.out.println(thumbImgUrl);
 
-					VideoInfo info = new VideoInfo();
+					
 					info.mTitle = title;
 					info.mVideoThumbUrl = thumbImgUrl;
-					info.mVideoUrl = videoUrl;
 					info.mFromType=FromType.FROM_RENREN;
 					
 					CrawlerMananger.getInstance().addVideo(info);
@@ -143,7 +143,7 @@ public class VideoCrawler {
 	 * @return
 	 * @throws IOException 
 	 */
-	private String getVideoUrl(String url) throws IOException {
+	private void getVideoUrl(String url,VideoInfo info) throws IOException {
 		String videoUrl = null;
 
 		/*
@@ -159,10 +159,17 @@ public class VideoCrawler {
 		Elements elements = doc.select(".videoimg");
 		videoUrl = elements.get(0).attr("alt");
 		if(videoUrl.contains("http:")){
-		    videoUrl = videoUrl.substring(videoUrl.indexOf("http:"));
+		    info.mVideoUrl = videoUrl.substring(videoUrl.indexOf("http:"));
 		}
 		
-		return videoUrl;
+		//视频对应的web页面，该页面不仅包含视频还包含评论，广告等其它东西
+		Element element = doc.select(".share-from .float-left a").get(0);
+		String webVideoUrl=element.attr("href");
+		if(webVideoUrl!=null && !webVideoUrl.isEmpty()){
+		    info.mWebVideoUrl=webVideoUrl;
+		}
+		
+		return;
 	}
 
 }

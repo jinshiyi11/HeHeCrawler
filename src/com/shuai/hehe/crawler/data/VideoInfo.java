@@ -20,6 +20,11 @@ public class VideoInfo {
 	public String mVideoUrl;
 	
 	/**
+     * 视频对应的web页面，该页面不仅包含视频还包含评论，广告等其它东西
+     */
+    public String mWebVideoUrl;
+	
+	/**
 	 * 新鲜事来源
 	 */
 	public int mFromType=FromType.FROM_RENREN;

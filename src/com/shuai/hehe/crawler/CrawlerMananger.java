@@ -87,6 +87,13 @@ public class CrawlerMananger {
             }
             
             try {
+                Thread.currentThread().sleep(2000);
+            } catch (InterruptedException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            
+            try {
                 VideoInfo videoInfo=mVideoInfos.take();
                 
                 DataManager.getInstance().addHotVideo(videoInfo);

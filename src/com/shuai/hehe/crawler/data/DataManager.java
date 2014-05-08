@@ -138,6 +138,10 @@ public class DataManager {
 	
 	private static class VideoContent{
 		String videoUrl;
+		/**
+		 * 视频对应的web页面，该页面不仅包含视频还包含评论，广告等其它东西
+		 */
+		String webVideoUrl;
 		String thumbImgUrl;
 	}
 	
@@ -191,6 +195,7 @@ public class DataManager {
 			
 			VideoContent videoContent=new VideoContent();
 			videoContent.videoUrl=info.mVideoUrl;
+			videoContent.webVideoUrl=info.mWebVideoUrl;
 			videoContent.thumbImgUrl=info.mVideoThumbUrl;
 			
 			Gson gson=new Gson();
