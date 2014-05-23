@@ -2,6 +2,7 @@ package com.shuai.hehe.crawler;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,7 @@ public class CrawlerMananger {
     
     private static CrawlerMananger mCrawlerMananger;
     
-    private Executor mExecutor;
+    private ExecutorService mExecutor;
     
     private LinkedBlockingQueue<AlbumInfo> mAlbumInfos=new LinkedBlockingQueue<AlbumInfo>();
     private LinkedBlockingQueue<VideoInfo> mVideoInfos=new LinkedBlockingQueue<VideoInfo>();
@@ -41,6 +42,16 @@ public class CrawlerMananger {
         }
         
         return mCrawlerMananger;
+    }
+    
+    public void shutdown(){
+        mExecutor.shutdown();
+        try {
+            mExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
     public Executor getExecutor() {
@@ -85,7 +96,7 @@ public class CrawlerMananger {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            
+            /* 
             try {
                 Thread.currentThread().sleep(2000);
             } catch (InterruptedException e1) {
@@ -101,6 +112,8 @@ public class CrawlerMananger {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            
+            */
         }
     }
 

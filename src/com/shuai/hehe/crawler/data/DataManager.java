@@ -25,6 +25,9 @@ public class DataManager {
 	private String mDbHost;
 	private int mDbPort;
 	
+	private long mShowTime=System.currentTimeMillis();
+	public long mShowTimeStep=30*60*1000;
+	
 	private static String mDriverName="com.mysql.jdbc.Driver";//"org.sqlite.JDBC"
 	
 	{
@@ -205,9 +208,10 @@ public class DataManager {
 			statement.setInt(1, FeedType.TYPE_VIDEO);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
-			statement.setInt(4, info.mFromType);
-			statement.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+			statement.setInt(4, info.mFromType);			
+			statement.setTimestamp(5, new Timestamp(mShowTime));
 			statement.executeUpdate();
+			mShowTime+=mShowTimeStep;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -243,8 +247,8 @@ public class DataManager {
 			statement.setInt(1, FeedType.TYPE_ALBUM);
 			statement.setString(2, processStringForSqlite(info.mTitle));
 			statement.setString(3, processStringForSqlite(content));
-			statement.setInt(4, info.mFromType);
-			statement.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+			statement.setInt(4, info.mFromType);			
+			statement.setTimestamp(5, new Timestamp(mShowTime));
 			statement.executeUpdate();
 			
 			generatedKeys = statement.getGeneratedKeys();
@@ -262,6 +266,7 @@ public class DataManager {
 			}else{
 				throw new SQLException("INSERT INTO hot_feed failed!!");
 			}
+			mShowTime+=mShowTimeStep;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

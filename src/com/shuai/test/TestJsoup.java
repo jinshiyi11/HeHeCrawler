@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.shuai.hehe.crawler.CrawlerMananger;
 import com.shuai.hehe.crawler.PicCrawler;
 import com.shuai.hehe.crawler.VideoCrawler;
 
@@ -34,7 +35,7 @@ public class TestJsoup {
 		
 		picThread.setName("picThread");
 		picThread.start();
-		
+		/*
 		Thread videoThread=new Thread(){
 
 			@Override
@@ -47,10 +48,11 @@ public class TestJsoup {
 		
 		videoThread.setName("videoThread");
 		videoThread.start();
-		
+		*/
 		
 		try {
-			videoThread.join();
+		    picThread.join();
+		    CrawlerMananger.getInstance().shutdown();
 //			Thread.currentThread().wait();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
