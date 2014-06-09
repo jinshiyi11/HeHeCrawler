@@ -33,7 +33,7 @@ public class PicCrawler {
 	 */
 	private int mPageCount;
 	
-	private static int MAX_ALBUM_COUNT=200;
+	private static int MAX_ALBUM_COUNT=1000;
 	
 	private CrawlerMananger mCrawlerMananger=CrawlerMananger.getInstance();
 	
@@ -52,7 +52,11 @@ public class PicCrawler {
         public void run() {
             Thread.currentThread().setName("SubPicCrawler");
             AlbumInfo albumInfo = getAlbumInfo(href, title, thumbUrl);
-            mCrawlerMananger.addAlbum(albumInfo);
+            if (albumInfo.mPics.size() == 0) {
+                System.err.println("empty album:"+albumInfo.mTitle);
+            } else {
+                mCrawlerMananger.addAlbum(albumInfo);
+            }
         }
         
     }
@@ -162,12 +166,12 @@ public class PicCrawler {
             }
         }
         
-        if(!found){
-            //没找到大图，只能用缩略图了
-            albumInfo.mAlbumPicUrl=albumInfo.mAlbumThumbUrl;
+        if(!found && albumInfo.mPics.size()>0){
+            //没找到大图，使用第一张大图
+            albumInfo.mAlbumPicUrl=albumInfo.mPics.get(0).mBigUrl;
         }
 
-        System.out.println(String.format("相册:%s包含%d张图片", albumTitle, albumInfo.mPics.size()));
+        //System.out.println(String.format("相册:%s包含%d张图片", albumTitle, albumInfo.mPics.size()));
         return albumInfo;
 	}
 	
@@ -228,10 +232,10 @@ public class PicCrawler {
 					// 缩略图地址
 					String thumbPicUrl = thumbPic.attr("src");
 					
-					System.out.println();
-					System.out.println(picDescription);
-					System.out.println(thumbPicUrl);
-					System.out.println(bigPicUrl);
+//					System.out.println();
+//					System.out.println(picDescription);
+//					System.out.println(thumbPicUrl);
+//					System.out.println(bigPicUrl);
 					
 					PicInfo picInfo=new PicInfo();
 					picInfo.mThumbUrl=thumbPicUrl;

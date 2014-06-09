@@ -26,7 +26,7 @@ public class DataManager {
 	private int mDbPort;
 	
 	private long mShowTime=System.currentTimeMillis();
-	public long mShowTimeStep=30*60*1000;
+	public long mShowTimeStep=60*60*1000;
 	
 	private static String mDriverName="com.mysql.jdbc.Driver";//"org.sqlite.JDBC"
 	
