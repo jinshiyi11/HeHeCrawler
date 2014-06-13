@@ -166,7 +166,7 @@ public class PicCrawler {
             }
         }
         
-        if(!found && albumInfo.mPics.size()>0){
+        if(!found && albumInfo.mPics.size()>0 && albumInfo.mPics.get(0).mBigUrl!=null){
             //没找到大图，使用第一张大图
             albumInfo.mAlbumPicUrl=albumInfo.mPics.get(0).mBigUrl;
         }

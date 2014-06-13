@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import com.google.gson.Gson;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
@@ -277,5 +279,33 @@ public class DataManager {
 		}
 		
 	}
+
+
+	/**
+	 * 辅助更新show_time字段
+	 */
+    public void updateShowTime() {
+        long startTime=0;
+        try {
+            startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2014-06-19 09:03:31").getTime();
+        } catch (ParseException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        try {
+            Connection connection = getConnection();
+            PreparedStatement prepareStatement = connection.prepareStatement("SELECT id, show_time FROM hehe.hot_feed where id>240",ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = prepareStatement.executeQuery();
+            while(rs.next()){
+                rs.updateTimestamp(2, new Timestamp(startTime));
+                startTime+=mShowTimeStep;
+                rs.updateRow();
+            }
+            rs.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
 }
