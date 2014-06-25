@@ -169,7 +169,7 @@ public class SqliteDataManager {
 			statement = connection.createStatement();
 			
 			VideoContent videoContent=new VideoContent();
-			videoContent.videoUrl=info.mVideoUrl;
+			videoContent.videoUrl=info.mFlashVideoUrl;
 			videoContent.thumbImgUrl=info.mVideoThumbUrl;
 			
 			Gson gson=new Gson();
@@ -214,7 +214,7 @@ public class SqliteDataManager {
 				long feed_id=generatedKeys.getLong(1);
 				
 				for (PicInfo pic : info.mPics) {
-					sql=String.format("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(%d,'%s','%s','%s')",feed_id,processStringForSqlite(pic.mThumbUrl),processStringForSqlite(pic.mBigUrl),processStringForSqlite(pic.mDescription));
+					sql=String.format("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(%d,'%s','%s','%s')",feed_id,processStringForSqlite(pic.mThumbImgUrl),processStringForSqlite(pic.mBigImgUrl),processStringForSqlite(pic.mDescription));
 					statement.execute(sql);
 				}
 			}else{

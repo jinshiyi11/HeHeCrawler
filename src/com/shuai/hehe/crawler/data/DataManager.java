@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 
 public class DataManager {
@@ -28,7 +29,7 @@ public class DataManager {
 	private int mDbPort;
 	
 	private long mShowTime=System.currentTimeMillis();
-	public long mShowTimeStep=60*60*1000;
+	public long mShowTimeStep=30*60*1000;
 	
 	private static String mDriverName="com.mysql.jdbc.Driver";//"org.sqlite.JDBC"
 	
@@ -54,6 +55,9 @@ public class DataManager {
 			throw new RuntimeException();
 		}
 		createDb();
+		
+		//init startTime
+		initShowTime();
 	}
 	
 	/**
@@ -107,6 +111,27 @@ public class DataManager {
 		}
 	}
 	
+	/**
+	 * 新插入的新鲜事的展示时间接在前一条新鲜事之后
+	 * @throws SQLException
+	 */
+	private void initShowTime(){
+	    Connection connection;
+        try {
+            connection = getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT show_time FROM hot_feed ORDER BY show_time DESC LIMIT 1");
+            if(resultSet.next()){
+                mShowTime=resultSet.getTimestamp("show_time").getTime()+mShowTimeStep;
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+	    
+	}
+	
 	public static synchronized  DataManager getInstance(){
 		if(mDataManager==null)
 			mDataManager=new DataManager();
@@ -142,17 +167,35 @@ public class DataManager {
 	}
 	
 	private static class VideoContent{
-		String videoUrl;
+	    /**
+	     * flash格式视频的url
+	     */
+	    @SerializedName("flashVideoUrl")
+		String mFlashVideoUrl;
+	    
 		/**
 		 * 视频对应的web页面，该页面不仅包含视频还包含评论，广告等其它东西
 		 */
-		String webVideoUrl;
-		String thumbImgUrl;
+	    @SerializedName("webVideoUrl")
+		String mWebVideoUrl;
+		
+	    /**
+	     * 视频预览图url
+	     */
+	    @SerializedName("videoThumbUrl")
+		String mVideoThumbUrl;
 	}
 	
 	private static class AlbumContent{
-		String thumbImgUrl;
-		String bigImgUrl;
+	    @SerializedName("thumbImgUrl")
+		String mThumbImgUrl;
+	    
+	    @SerializedName("bigImgUrl")
+		String mBigImgUrl;
+	}
+	
+	public boolean isFeedExist(String title){
+	    return isFeedExist("hot_feed", title);
 	}
 	
 	/**
@@ -199,17 +242,17 @@ public class DataManager {
 			connection = getConnection();
 			
 			VideoContent videoContent=new VideoContent();
-			videoContent.videoUrl=info.mVideoUrl;
-			videoContent.webVideoUrl=info.mWebVideoUrl;
-			videoContent.thumbImgUrl=info.mVideoThumbUrl;
+			videoContent.mFlashVideoUrl=info.mFlashVideoUrl;
+			videoContent.mWebVideoUrl=info.mWebVideoUrl;
+			videoContent.mVideoThumbUrl=info.mVideoThumbUrl;
 			
 			Gson gson=new Gson();
 			String content=gson.toJson(videoContent);
 			
 			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`,show_time) values(?,?,?,?,?)");
 			statement.setInt(1, FeedType.TYPE_VIDEO);
-			statement.setString(2, processStringForSqlite(info.mTitle));
-			statement.setString(3, processStringForSqlite(content));
+			statement.setString(2, info.mTitle);
+			statement.setString(3, content);
 			statement.setInt(4, info.mFromType);			
 			statement.setTimestamp(5, new Timestamp(mShowTime));
 			statement.executeUpdate();
@@ -239,16 +282,16 @@ public class DataManager {
 			connection = getConnection();
 			
 			AlbumContent albumContent=new AlbumContent();
-			albumContent.thumbImgUrl=info.mAlbumThumbUrl;
-			albumContent.bigImgUrl=info.mAlbumPicUrl;
+			albumContent.mThumbImgUrl=info.mAlbumThumbUrl;
+			albumContent.mBigImgUrl=info.mAlbumPicUrl;
 			
 			Gson gson=new Gson();
 			String content=gson.toJson(albumContent);
 			
 			statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`,show_time) values(?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 			statement.setInt(1, FeedType.TYPE_ALBUM);
-			statement.setString(2, processStringForSqlite(info.mTitle));
-			statement.setString(3, processStringForSqlite(content));
+			statement.setString(2, info.mTitle);
+			statement.setString(3, content);
 			statement.setInt(4, info.mFromType);			
 			statement.setTimestamp(5, new Timestamp(mShowTime));
 			statement.executeUpdate();
@@ -260,9 +303,9 @@ public class DataManager {
 				for (PicInfo pic : info.mPics) {
 					statement=connection.prepareStatement("INSERT INTO pic(feed_id,thumb_url,big_url,description) values(?,?,?,?)");
 					statement.setInt(1, (int) feed_id);
-					statement.setString(2, processStringForSqlite(pic.mThumbUrl));
-					statement.setString(3, processStringForSqlite(pic.mBigUrl));
-					statement.setString(4, processStringForSqlite(pic.mDescription));
+					statement.setString(2, pic.mThumbImgUrl);
+					statement.setString(3, pic.mBigImgUrl);
+					statement.setString(4, pic.mDescription);
 					statement.executeUpdate();
 				}
 			}else{

@@ -17,7 +17,7 @@ public class AlbumInfo {
 	public String mAlbumThumbUrl;
 	
 	/**
-     * 相册封面图片url
+     * 相册封面大图url
      */
     public String mAlbumPicUrl;
 	
@@ -38,17 +38,22 @@ public class AlbumInfo {
 		/**
 		 * 相片缩略图url
 		 */
-		public String mThumbUrl;
+		public String mThumbImgUrl;
 		
 		/**
 		 * 相片大图url
 		 */
-		public String mBigUrl;
+		public String mBigImgUrl;
 		
 		/**
 		 * 相片描述
 		 */
 		public String mDescription;
 	}
+
+    @Override
+    public String toString() {
+        return "album=mTitle:"+mTitle+"\n";
+    }
 
 }

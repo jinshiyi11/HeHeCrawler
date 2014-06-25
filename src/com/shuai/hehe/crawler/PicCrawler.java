@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import com.shuai.hehe.crawler.data.AlbumInfo;
 import com.shuai.hehe.crawler.data.AlbumInfo.PicInfo;
 import com.shuai.hehe.crawler.data.Constants;
+import com.shuai.hehe.crawler.data.DataManager;
 import com.shuai.hehe.crawler.data.FromType;
 
 /**
@@ -33,7 +34,7 @@ public class PicCrawler {
 	 */
 	private int mPageCount;
 	
-	private static int MAX_ALBUM_COUNT=1000;
+	private static int MAX_ALBUM_COUNT=100;
 	
 	private CrawlerMananger mCrawlerMananger=CrawlerMananger.getInstance();
 	
@@ -69,6 +70,11 @@ public class PicCrawler {
 	    String url=mStartUrl;
         while (url!=null && url.length()>0) {
             url=getAlbums(url);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         
         System.out.println("pic crawler finished!!");
@@ -104,6 +110,9 @@ public class PicCrawler {
                 Element link = element.select("h3 a[href]").get(0);
                 //TODO:check
                 String title = link.ownText();
+                if(DataManager.getInstance().isFeedExist(title))
+                    continue;
+                
                 String href = link.attr("href");
 
                 Element img = element.select(".content .photos img").get(0);
@@ -158,7 +167,7 @@ public class PicCrawler {
         //从所有相册图片中查找相册封面缩略图对应的大图的url
         boolean found=false;
         for (AlbumInfo.PicInfo picInfo : albumInfo.mPics) {
-            String bigUrl = picInfo.mBigUrl;
+            String bigUrl = picInfo.mBigImgUrl;
             if(isBigPicUrl(bigUrl, albumInfo.mAlbumThumbUrl)){
                 found=true;
                 albumInfo.mAlbumPicUrl=bigUrl;
@@ -166,9 +175,9 @@ public class PicCrawler {
             }
         }
         
-        if(!found && albumInfo.mPics.size()>0 && albumInfo.mPics.get(0).mBigUrl!=null){
+        if(!found && albumInfo.mPics.size()>0 && albumInfo.mPics.get(0).mBigImgUrl!=null){
             //没找到大图，使用第一张大图
-            albumInfo.mAlbumPicUrl=albumInfo.mPics.get(0).mBigUrl;
+            albumInfo.mAlbumPicUrl=albumInfo.mPics.get(0).mBigImgUrl;
         }
 
         //System.out.println(String.format("相册:%s包含%d张图片", albumTitle, albumInfo.mPics.size()));
@@ -238,8 +247,8 @@ public class PicCrawler {
 //					System.out.println(bigPicUrl);
 					
 					PicInfo picInfo=new PicInfo();
-					picInfo.mThumbUrl=thumbPicUrl;
-					picInfo.mBigUrl=bigPicUrl;
+					picInfo.mThumbImgUrl=thumbPicUrl;
+					picInfo.mBigImgUrl=bigPicUrl;
 					picInfo.mDescription=picDescription;
 					albumInfo.mPics.add(picInfo);
 				} catch (Exception e) {

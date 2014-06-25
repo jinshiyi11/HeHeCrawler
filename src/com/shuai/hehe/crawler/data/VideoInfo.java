@@ -15,9 +15,9 @@ public class VideoInfo {
 	public String mVideoThumbUrl;
 	
 	/**
-	 * 视频url
+	 * flash格式视频的url
 	 */
-	public String mVideoUrl;
+	public String mFlashVideoUrl;
 	
 	/**
      * 视频对应的web页面，该页面不仅包含视频还包含评论，广告等其它东西
@@ -28,5 +28,10 @@ public class VideoInfo {
 	 * 新鲜事来源
 	 */
 	public int mFromType=FromType.FROM_RENREN;
+	
+	@Override
+    public String toString() {
+        return "video=mTitle:"+mTitle+"\n";
+    }
 
 }

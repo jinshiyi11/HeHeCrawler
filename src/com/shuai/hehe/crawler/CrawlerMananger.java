@@ -1,5 +1,6 @@
 package com.shuai.hehe.crawler;
 
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -81,39 +82,33 @@ public class CrawlerMananger {
         try {
             mVideoInfos.put(info);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
     
     public void processFeed() {
         while (true) {
+            Random random=new Random();
             try {
-                AlbumInfo albumInfo=mAlbumInfos.take();
-                
-                DataManager.getInstance().addHotAlbum(albumInfo);
+                int num=random.nextInt(5)+1;
+                if(num<=3){
+                    AlbumInfo info=mAlbumInfos.poll(10, TimeUnit.MINUTES);
+                    if(info!=null){
+                        System.out.println(info);
+                        DataManager.getInstance().addHotAlbum(info);
+                    }
+                }else{
+                    VideoInfo info=mVideoInfos.poll(10, TimeUnit.MINUTES);
+                    if(info!=null){
+                        System.out.println(info);
+                        DataManager.getInstance().addHotVideo(info);
+                    }
+                }
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            /* 
-            try {
-                Thread.currentThread().sleep(2000);
-            } catch (InterruptedException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            
-            try {
-                VideoInfo videoInfo=mVideoInfos.take();
-                
-                DataManager.getInstance().addHotVideo(videoInfo);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            
-            */
+           
         }
     }
 

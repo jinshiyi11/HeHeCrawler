@@ -35,7 +35,7 @@ public class TestJsoup {
 		
 		picThread.setName("picThread");
 		picThread.start();
-		/*
+		
 		Thread videoThread=new Thread(){
 
 			@Override
@@ -48,10 +48,11 @@ public class TestJsoup {
 		
 		videoThread.setName("videoThread");
 		videoThread.start();
-		*/
+		
 		
 		try {
 		    picThread.join();
+		    videoThread.join();
 		    CrawlerMananger.getInstance().shutdown();
 //			Thread.currentThread().wait();
 		} catch (InterruptedException e) {

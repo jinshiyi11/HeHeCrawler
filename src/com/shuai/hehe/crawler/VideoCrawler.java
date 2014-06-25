@@ -31,7 +31,7 @@ public class VideoCrawler {
 	 */
 	private int mPageCount;
 	
-	private static int MAX_VIDEO_COUNT=1;
+	private static int MAX_VIDEO_COUNT=100;
 	
 	public VideoCrawler(String startUrl) {
 		mStartUrl = startUrl;
@@ -41,6 +41,11 @@ public class VideoCrawler {
 	    String url=mStartUrl;
 	    while (url!=null && url.length()>0) {
 	        url=getVideos(url);
+	        try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 		
 	}
@@ -77,10 +82,17 @@ public class VideoCrawler {
 					Element link = element.select("h3 a[href]").get(0);
 					// TODO:check
 					String title = link.ownText();
+					if(DataManager.getInstance().isFeedExist(title))
+	                    continue;
+					
 					String href = link.attr("href");
 					getVideoUrl(href,info);
-					if(info.mVideoUrl==null)
+					if(info.mFlashVideoUrl==null || info.mWebVideoUrl==null){
+					    //TODO:LOG
+					    System.err.println("video url empty");
 					    continue;
+					}
+					    
 
 					Element div = element.select(".content .video").get(0);
 /*
@@ -90,14 +102,18 @@ public class VideoCrawler {
  */
 					String style = div.attr("style");
 					int beginIndex = style.indexOf("('");
-					if (beginIndex == -1)
-						throw new RuntimeException();
+					if (beginIndex == -1){
+					    System.err.println("no thumbImgUrl:"+style);
+						continue;
+					}
 
 					beginIndex += 2;
 
 					int endIndex = style.indexOf("')");
-					if (endIndex == -1)
-						throw new RuntimeException();
+					if (endIndex == -1){
+					    System.err.println("no thumbImgUrl:"+style);
+                        continue;
+                    }
 
 					String thumbImgUrl = style.substring(beginIndex, endIndex);
 
@@ -105,7 +121,7 @@ public class VideoCrawler {
 
 					System.out.println();
 					System.out.println(title);
-					System.out.println(info.mVideoUrl);
+					System.out.println(info.mFlashVideoUrl);
 					System.out.println(thumbImgUrl);
 
 					
@@ -114,6 +130,9 @@ public class VideoCrawler {
 					info.mFromType=FromType.FROM_RENREN;
 					
 					CrawlerMananger.getInstance().addVideo(info);
+					
+					if(mVideoCount>=MAX_VIDEO_COUNT)
+                        return null;
 				} catch (IOException ex) {
 					//ex.printStackTrace();
 				}
@@ -159,7 +178,7 @@ public class VideoCrawler {
 		Elements elements = doc.select(".videoimg");
 		videoUrl = elements.get(0).attr("alt");
 		if(videoUrl.contains("http:")){
-		    info.mVideoUrl = videoUrl.substring(videoUrl.indexOf("http:"));
+		    info.mFlashVideoUrl = videoUrl.substring(videoUrl.indexOf("http:"));
 		}
 		
 		//视频对应的web页面，该页面不仅包含视频还包含评论，广告等其它东西
