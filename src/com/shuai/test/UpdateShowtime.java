@@ -2,9 +2,9 @@ package com.shuai.test;
 
 import com.shuai.hehe.crawler.data.DataManager;
 
-public class UpdateShowtime {
+public class UpdateShowTime {
 
-    public UpdateShowtime() {
+    public UpdateShowTime() {
         // TODO Auto-generated constructor stub
     }
     
