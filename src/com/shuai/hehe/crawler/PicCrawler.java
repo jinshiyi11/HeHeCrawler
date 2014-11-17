@@ -34,7 +34,7 @@ public class PicCrawler {
 	 */
 	private int mPageCount;
 	
-	private static int MAX_ALBUM_COUNT=100;
+	private static int MAX_ALBUM_COUNT=1000;
 	
 	private CrawlerMananger mCrawlerMananger=CrawlerMananger.getInstance();
 	
@@ -101,7 +101,10 @@ public class PicCrawler {
 
 		Document doc;
 		try {
-			doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
+			doc = Jsoup.connect(url).userAgent(Constants.USER_AGENT)
+//			        .cookie("p", "33fb45a605c8ce65e63595467994811f8")
+//			        .cookie("t", "35aad5365c66978703f1448e65f90aa28")
+			        .timeout(Constants.JSOUP_TIMEOUT).get();
 			// System.out.print(doc);
 			Elements items = doc.select(".share-hot-list .share.clearfix");
 			
@@ -226,7 +229,7 @@ public class PicCrawler {
 
 		Document doc;
 		try {
-			doc = Jsoup.connect(albumUrl).timeout(Constants.JSOUP_TIMEOUT).get();
+			doc = Jsoup.connect(albumUrl).userAgent(Constants.USER_AGENT).timeout(Constants.JSOUP_TIMEOUT).get();
 			// System.out.print(doc);
 			Elements items = doc.select("#albumThumbMode li");
 			for (Element item : items) {
@@ -279,7 +282,7 @@ public class PicCrawler {
 		String bigPicUrl = null;
 		
 		Document doc;
-		doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
+		doc = Jsoup.connect(url).userAgent(Constants.USER_AGENT).timeout(Constants.JSOUP_TIMEOUT).get();
 		Elements elements=doc.select("#photoLink img");
 		if(elements.size()>0)
 			bigPicUrl=elements.get(0).attr("src");

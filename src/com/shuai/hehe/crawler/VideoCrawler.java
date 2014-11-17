@@ -31,7 +31,7 @@ public class VideoCrawler {
 	 */
 	private int mPageCount;
 	
-	private static int MAX_VIDEO_COUNT=100;
+	private static int MAX_VIDEO_COUNT=1000;
 	
 	public VideoCrawler(String startUrl) {
 		mStartUrl = startUrl;
@@ -71,7 +71,10 @@ public class VideoCrawler {
 
 		Document doc;
 		try {
-			doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
+			doc = Jsoup.connect(url).userAgent(Constants.USER_AGENT)
+//			        .cookie("p", "33fb45a605c8ce65e63595467994811f8")
+//                    .cookie("t", "35aad5365c66978703f1448e65f90aa28")
+			        .timeout(Constants.JSOUP_TIMEOUT).get();
 			// System.out.print(doc);
 			Elements items = doc.select(".share-hot-list li");
 			
@@ -133,7 +136,7 @@ public class VideoCrawler {
 					
 					if(mVideoCount>=MAX_VIDEO_COUNT)
                         return null;
-				} catch (IOException ex) {
+				} catch (Exception ex) {
 					//ex.printStackTrace();
 				}
 			}
@@ -171,7 +174,7 @@ public class VideoCrawler {
 		 * alt="1.2;http://player.56.com/renrenshare_MTA1MDc5NDcx.swf" /></div>
 		 */
 		Document doc;
-		doc = Jsoup.connect(url).timeout(Constants.JSOUP_TIMEOUT).get();
+		doc = Jsoup.connect(url).userAgent(Constants.USER_AGENT).timeout(Constants.JSOUP_TIMEOUT).get();
 		// Elements elements = doc.select("embed[src]");
 		// videoUrl = elements.get(0).attr("src");
 

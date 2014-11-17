@@ -1,6 +1,9 @@
 package com.shuai.hehe.crawler.data;
 
-public class Constants {
+public final class Constants {
+    
+    public static String USER_AGENT="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36";
+    
 	/**
 	 * 爬虫访问网络的超时时间，单位ms
 	 */
