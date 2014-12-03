@@ -86,7 +86,13 @@ public class DataManager {
 							"description TEXT," +
 							"insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()," +
 							"show_time TIMESTAMP DEFAULT 0" +
-							")"
+							")",
+							
+					"CREATE TABLE IF NOT EXISTS blog(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                            "feed_id INT," +
+                            "html_content TEXT," +
+                            "insert_time TIMESTAMP DEFAULT  CURRENT_TIMESTAMP()" +
+                            ")"
 							};
 			
 //			String[] indexs={"CREATE INDEX IF NOT EXISTS type_title_index ON hot_feed(type,title)"};
@@ -194,6 +200,20 @@ public class DataManager {
 		String mBigImgUrl;
 	}
 	
+	private static class BlogContent{
+	    /**
+	     * 日志摘要
+	     */
+	    @SerializedName("summary")
+	    String mSummary;
+	    
+	    /**
+	     * 日志对应的url页面
+	     */
+	    @SerializedName("webUrl")
+	    String mWebUrl;
+	}
+	
 	public boolean isFeedExist(String title){
 	    return isFeedExist("hot_feed", title);
 	}
@@ -232,7 +252,7 @@ public class DataManager {
 	 * 添加热门视频
 	 * @param info
 	 */
-	public void addHotVideo(VideoInfo info) {
+	public void addVideo(VideoInfo info) {
 		if(isFeedExist("hot_feed",info.mTitle))
 			return;
 		
@@ -271,7 +291,7 @@ public class DataManager {
 	 * 添加一个相册信息
 	 * @param info
 	 */
-	public void addHotAlbum(AlbumInfo info){
+	public void addAlbum(AlbumInfo info){
 		if(isFeedExist("hot_feed",info.mTitle))
 			return;
 		
@@ -321,6 +341,54 @@ public class DataManager {
 			closeConnection(connection);
 		}
 		
+	}
+	
+	/**
+	 * 添加一条日志
+	 * @param info
+	 */
+	public void addBlog(BlogInfo info){
+        if(isFeedExist("hot_feed",info.getTitle()))
+            return;
+        
+        Connection connection = null;
+        ResultSet generatedKeys = null;
+        PreparedStatement statement = null;
+        try {
+            connection = getConnection();
+            BlogContent contentData=new BlogContent();
+            contentData.mSummary=info.getSummary();
+            contentData.mWebUrl=info.getWebUrl();
+            
+            Gson gson=new Gson();
+            String content=gson.toJson(contentData);
+            
+            statement=connection.prepareStatement("INSERT INTO hot_feed(type,title,content,`from`,show_time) values(?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            statement.setInt(1, FeedType.TYPE_BLOG);
+            statement.setString(2, info.getTitle());
+            statement.setString(3, content);
+            statement.setInt(4, info.getFromType());            
+            statement.setTimestamp(5, new Timestamp(mShowTime));
+            statement.executeUpdate();
+            
+            generatedKeys = statement.getGeneratedKeys();
+            if(generatedKeys.next()){
+                long feed_id=generatedKeys.getLong(1);
+                
+                statement=connection.prepareStatement("INSERT INTO blog(feed_id,html_content) values(?,?)");
+                statement.setInt(1, (int) feed_id);
+                statement.setString(2, info.getHtmlContent());
+                statement.executeUpdate();
+            }else{
+                throw new SQLException("INSERT INTO hot_feed failed!!");
+            }
+            mShowTime+=mShowTimeStep;
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally{
+            closeConnection(connection);
+        }
 	}
 
 

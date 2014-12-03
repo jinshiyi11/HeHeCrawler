@@ -100,7 +100,7 @@ public class BlogCrawler {
                     info.setHtmlContent(content);
                     info.setfromType(FromType.FROM_RENREN);
 
-                    //CrawlerMananger.getInstance().addBlog(info);
+                    CrawlerMananger.getInstance().addBlog(info);
 
                     if (mVideoCount >= MAX_VIDEO_COUNT)
                         return null;
@@ -131,8 +131,11 @@ public class BlogCrawler {
      */
     private String getBlogContent(String url, BlogInfo info) throws IOException {
         Document doc = Jsoup.connect(url).userAgent(Constants.USER_AGENT)
-                .cookie("p", "f801d1e42436d86b460968b68398113e8").cookie("t", "f6ad09f668a6b6c1a8218ef45b4b6a5d8")
-                .cookie("id", "225521668").timeout(Constants.JSOUP_TIMEOUT).get();
+                .cookie("p", Constants.RENREN_P_KEY)
+                .cookie("t", Constants.RENREN_T_KEY)
+                .cookie("id", Constants.RENREN_ID)
+                .timeout(Constants.JSOUP_TIMEOUT)
+                .get();
 
         Element element = doc.select("div.content-body").get(0);
         String content = element.outerHtml();
