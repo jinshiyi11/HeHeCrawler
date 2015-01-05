@@ -228,13 +228,15 @@ public class DataManager {
 		boolean exist=false;
 		
 		Connection connection = null;
-		Statement statement = null;
+		PreparedStatement statement = null;
 		ResultSet resultSet=null;
 		try {
 			connection = getConnection();
-			statement = connection.createStatement();
+			statement = connection.prepareStatement("select * from ? where title=? limit 1");
+			statement.setString(1, tableName);
+			statement.setString(2, title);
+			resultSet = statement.executeQuery();
 			
-			resultSet = statement.executeQuery(String.format("select * from %s where title='%s' limit 1", tableName,processStringForSqlite(title)));
 			if(resultSet.next())
 				exist=true;
 		} catch (SQLException e) {
