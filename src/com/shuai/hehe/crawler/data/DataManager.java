@@ -232,9 +232,8 @@ public class DataManager {
 		ResultSet resultSet=null;
 		try {
 			connection = getConnection();
-			statement = connection.prepareStatement("select * from ? where title=? limit 1");
-			statement.setString(1, tableName);
-			statement.setString(2, title);
+			statement = connection.prepareStatement(String.format("select * from %1$s where title=? limit 1",tableName));
+			statement.setString(1, title);
 			resultSet = statement.executeQuery();
 			
 			if(resultSet.next())
