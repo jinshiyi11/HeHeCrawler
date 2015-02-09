@@ -11,6 +11,11 @@ public class TestJsoup {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+	    
+//	    System.setProperty("http.proxyHost", "localhost"); 
+//        System.setProperty("http.proxyPort", "8888"); 
+//        System.setProperty("https.proxyHost", "localhost"); 
+//        System.setProperty("https.proxyPort", "8888"); 
 		
 	    //照片
 		Thread picThread=new Thread(){
@@ -50,7 +55,7 @@ public class TestJsoup {
             
         };
         blogThread.setName("blogThread");
-        blogThread.start();
+        //blogThread.start();
 		
 		
 		try {

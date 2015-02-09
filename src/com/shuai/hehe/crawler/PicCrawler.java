@@ -34,7 +34,7 @@ public class PicCrawler {
 	 */
 	private int mPageCount;
 	
-	private static int MAX_ALBUM_COUNT=1000;
+	private static int MAX_ALBUM_COUNT=9000;
 	
 	private CrawlerMananger mCrawlerMananger=CrawlerMananger.getInstance();
 	

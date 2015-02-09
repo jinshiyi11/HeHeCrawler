@@ -47,6 +47,8 @@ public class VideoCrawler {
                 e.printStackTrace();
             }
         }
+	    
+	    System.out.println("video crawler finished!!");
 		
 	}
 	

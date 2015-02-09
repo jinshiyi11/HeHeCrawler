@@ -14,9 +14,9 @@ import com.shuai.hehe.crawler.data.FeedType;
 import com.shuai.hehe.crawler.data.VideoInfo;
 
 public class CrawlerMananger {
-    private static final int CORE_POOL_SIZE = 2;
+    private static final int CORE_POOL_SIZE = 3;
     private static final int MAXIMUM_POOL_SIZE = 5;//6;
-    private static final int KEEP_ALIVE = 5;
+    private static final int KEEP_ALIVE = 60;
 
     private static CrawlerMananger mCrawlerMananger;
 
@@ -104,31 +104,35 @@ public class CrawlerMananger {
      * @return
      */
     private int chooseFeed() {
-
         int result;
-        int num = mRandom.nextInt(5) + 1;
-        if (num <= 3) {
+        int num = mRandom.nextInt(10) + 1;
+        if (num <= 7) {
             result = FeedType.TYPE_ALBUM;
-        } else if (num <= 4) {
+        } else{
+            result = FeedType.TYPE_VIDEO;
+        }
+        
+        /*else if (num <= 9) {
             result = FeedType.TYPE_VIDEO;
         } else {
             result = FeedType.TYPE_BLOG;
-        }
+        }*/
 
         return result;
     }
 
     public void processFeed() {
         while (true) {
-
             try {
                 int type = chooseFeed();
+                //type=FeedType.TYPE_ALBUM;
                 switch (type) {
                 case FeedType.TYPE_ALBUM: {
                     AlbumInfo info = mAlbumInfos.poll(10, TimeUnit.MINUTES);
                     if (info != null) {
                         System.out.println(info);
-                        DataManager.getInstance().addAlbum(info);
+                        FeedUploader.getInstance().addFeed(info);
+                        //DataManager.getInstance().addAlbum(info);
                     }
                 }
                     break;
@@ -137,7 +141,8 @@ public class CrawlerMananger {
                     VideoInfo info = mVideoInfos.poll(10, TimeUnit.MINUTES);
                     if (info != null) {
                         System.out.println(info);
-                        DataManager.getInstance().addVideo(info);
+                        FeedUploader.getInstance().addFeed(info);
+                        //DataManager.getInstance().addVideo(info);
                     }
                 }
                     break;
@@ -146,7 +151,8 @@ public class CrawlerMananger {
                     BlogInfo info = mBlogInfos.poll(10, TimeUnit.MINUTES);
                     if (info != null) {
                         System.out.println(info);
-                        DataManager.getInstance().addBlog(info);
+                        FeedUploader.getInstance().addFeed(info);
+                        //DataManager.getInstance().addBlog(info);
                     }
                 }
                     break;
