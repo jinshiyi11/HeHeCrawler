@@ -14,7 +14,7 @@ import com.shuai.hehe.crawler.data.FeedType;
 import com.shuai.hehe.crawler.data.VideoInfo;
 
 public class CrawlerMananger {
-    private static final int CORE_POOL_SIZE = 3;
+    private static final int CORE_POOL_SIZE = 5;
     private static final int MAXIMUM_POOL_SIZE = 5;//6;
     private static final int KEEP_ALIVE = 60;
 
@@ -64,7 +64,7 @@ public class CrawlerMananger {
         System.out.println("CrawlerMananger queue size:" + queueSize);
         if (queueSize > 500) {
             try {
-                Thread.currentThread().sleep(50);
+                Thread.currentThread().sleep(1000);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -106,24 +106,27 @@ public class CrawlerMananger {
     private int chooseFeed() {
         int result;
         int num = mRandom.nextInt(10) + 1;
+        /*
         if (num <= 7) {
             result = FeedType.TYPE_ALBUM;
         } else{
             result = FeedType.TYPE_VIDEO;
         }
-        
+        */
         /*else if (num <= 9) {
             result = FeedType.TYPE_VIDEO;
         } else {
             result = FeedType.TYPE_BLOG;
         }*/
 
+        result = FeedType.TYPE_ALBUM;
         return result;
     }
 
     public void processFeed() {
         while (true) {
             try {
+                
                 int type = chooseFeed();
                 //type=FeedType.TYPE_ALBUM;
                 switch (type) {

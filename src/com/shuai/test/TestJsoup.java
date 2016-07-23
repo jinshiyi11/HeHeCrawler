@@ -22,7 +22,8 @@ public class TestJsoup {
 
 			@Override
 			public void run() {
-				PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
+				//PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/0");
+				PicCrawler picCrawler=new PicCrawler("http://share.renren.com/albumlist/200411");
 				picCrawler.start();
 			}
 			
@@ -42,7 +43,7 @@ public class TestJsoup {
 			
 		};
 		videoThread.setName("videoThread");
-		videoThread.start();
+		//videoThread.start();
 		
 		//日志
         Thread blogThread=new Thread(){
@@ -62,6 +63,8 @@ public class TestJsoup {
 		    picThread.join();
 		    videoThread.join();
 		    blogThread.join();
+		    
+		    Thread.currentThread().join();
 		    CrawlerMananger.getInstance().shutdown();
 //			Thread.currentThread().wait();
 		} catch (InterruptedException e) {
